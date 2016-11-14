@@ -1,0 +1,10 @@
+S .
+S src
+S test
+S tools
+
+B _build
+B _build/tools
+B _build/src
+B _build/test
+
