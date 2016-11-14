@@ -12,3 +12,9 @@ Also, feel free to send me links to articles/reports that could help designing t
 If you want to help me design this tool but you have no idea how : contact me.
 If you want to make a contribution remember only one thing : keep it simple, I don't want to have performance optimal code that I can't understand in a reasonnable amount of time.
 
+# Installation
+you should have installed ocaml and set the variable NPROC to the number of core you want to be used by the make file
+for example add this line at the end of your .bashrc
+'''
+export NPROC=8 (* if you have 8 cores*)
+'''
