@@ -7,7 +7,7 @@ https://ocaml.org/
 I'm currently developping a variant of BDDs and I got tired of dealing with manipulation of DAG. Furthermore at some point I decided that I will have to develop a way of manipulating circuits (such as AIG) which also are DAGs. Hence, I decided to design an abstract way of efficiently dealing with them.
 Feel free to use it and contribute !
 If you do so, please send me a message so I can keep track of who is using it and for which purpose.
-Also, feel free to send me links to articles/reports that could help designing this library.
+Also, feel free to send me links to articles/reports that could help design this library.
 
 If you want to help me design this tool but you have no idea how : contact me.
 
