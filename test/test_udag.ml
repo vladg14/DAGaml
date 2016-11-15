@@ -21,3 +21,4 @@ struct
 end;;
 
 module TestDAG = UDAG(HeaderTest);;
+module ReduceDAG = Reduce.Create(TestDAG)(TestDAG);;

@@ -50,19 +50,24 @@ struct
     type edge = Header.edge
     type node = Header.node
 
-	type ref_t =
+	type next_t =
 		| Leaf of leaf
 		| NodeRef of ident
-	type edge_t = edge * ref_t
+	type edge_t = edge * next_t
 	type node_t = node * (edge_t list)
 	
 	type manager = {
         unique : node_t H2Table.t;
 	}
 
-	let newman hsize = {
-		unique = H2Table.create hsize 0;
+    let default_newman_hsize = 10000
+
+	let newman () = {
+		unique = H2Table.create default_newman_hsize 0;
 	}
+    let makeman hsize = {
+        unique = H2Table.create hsize 0;
+    }
 	
 	let push udag = H2Table.push udag.unique
 	let pull udag = H2Table.pull udag.unique
@@ -152,7 +157,7 @@ struct
 				let getid = Hashtbl.find htbl
 				and add = Hashtbl.add htbl
 				and mem = Hashtbl.mem htbl in
-				let udag = newman n in
+				let udag = makeman n in
 				let load_node = function
 					| Tree.Node (ident::node) ->
 						let ident = StrTree.to_int ident in
