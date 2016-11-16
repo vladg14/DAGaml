@@ -124,32 +124,28 @@ struct
 			
 	let load =
 		match Header.load_leaf with
-			| None -> (function _ -> assert false)
+			| None -> None
 			| Some load_leaf ->
 		match Header.load_edge with
-			| None -> (function _ -> assert false)
+			| None -> None
 			| Some load_edge ->
 		match Header.load_node with
-			| None -> (function _ -> assert false)
+			| None -> None
 			| Some load_node ->
-		let load_leaf = match Header.load_leaf with
-			| Some load -> load
-			| None		-> assert false
-		in
-		let load_noderef getid = function
+		let load_next getid = function
 			| [Tree.Leaf "Leaf"; leaf] -> Leaf (load_leaf leaf)
 			| [Tree.Leaf "NodeRef"; ident] ->
 					NodeRef (getid (StrTree.to_int ident))
 			| _ -> assert false
 		in
 		let load_edge getid = function
-			| Tree.Node (edge::noderef) -> (load_edge edge, load_noderef getid noderef)
+			| Tree.Node (edge::noderef) -> (load_edge edge, load_next getid noderef)
 			| _ -> assert false
 		in
 		let load_node getid = function
 			| node::edges -> (load_node node, (List.map (load_edge getid) edges))
 			| _ -> assert false
-		in function
+		in Some (function
 			| Tree.Node [Tree.Node liste_nodes; Tree.Node liste_edges] ->
 			(
 				let n = List.length liste_nodes in
@@ -167,8 +163,9 @@ struct
 				in
 				List.iter load_node liste_nodes;
 				let liste_edges = List.map (load_edge getid) liste_edges in
-				liste_edges
+				udag, liste_edges
 			)
 			| _ -> assert false
+                )
 
 end
