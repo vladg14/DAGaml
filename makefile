@@ -2,7 +2,8 @@
 #LIBS=-lib /usr/lib64/ocaml/nums
 #LIBS=-lib /usr/lib/ocaml/nums
 SRCS=-Is tools,src
-OB=ocamlbuild -j ${NPROC} -r $(LIBS) $(SRCS)
+NPROC=$(shell nproc)
+OB=ocamlbuild -j $(NPROC) -r $(LIBS) $(SRCS)
 
 all:
 	$(OB) test/test_udag.native
