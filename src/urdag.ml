@@ -1,65 +1,50 @@
-(* UDAG : Unique - Directed Acyclic Diagramm
- *
+(* URDAG : Unique Recursive - Directed Acyclic Diagramm
  *)
-
-
-module type GRAPH_HEADER = sig
-    type leaf
-    type edge
-    type node
-end
-module type GRAPH = sig
-    include GRAPH_HEADER
-    type ident
+open Udag
+module type RGRAPH = sig
+	include GRAPH_HEADER
+	type ident
 
 	type next_t =
-		| Leaf of leaf
-		| NodeRef of ident
+		| Output	of int
+		| Leaf		of leaf
+		| NodeRef	of ident
 	type edge_t = edge * next_t
-	type node_t = node * (edge_t list)
-    
-    type manager
-    
-    val newman : unit -> manager
-    val push : manager -> node_t -> ident
-    val pull : manager -> ident -> node_t
+	type node_r =
+		| Node		of node
+		| Graph		of edge_t
+	type node_t = node_r * (edge_t list)
 	
-end
-module type UDAG_HEADER = sig
-	include GRAPH_HEADER
-
-	val dump_leaf : (leaf -> StrTree.tree) option
-	val load_leaf : (StrTree.tree -> leaf) option
-	val dot_of_leaf : (leaf -> string) option
-
-	val dump_edge : (edge -> StrTree.tree) option
-	val load_edge : (StrTree.tree -> edge) option
-	val dot_of_edge : (edge -> string) option
+	type manager
 	
-	val dump_node : (node -> StrTree.tree) option
-	val load_node : (StrTree.tree -> node) option
-	val dot_of_node : (int -> node -> string) option
-
+	val newman : unit -> manager
+	val push : manager -> node_t -> ident
+	val pull : manager -> ident -> node_t
 end
-module	UDAG	(Header:UDAG_HEADER) =
+
+module URDAG	(Header:UDAG_HEADER) =
 struct
 	type ident = int
-
-    type leaf = Header.leaf
+    
+	type leaf = Header.leaf
     type edge = Header.edge
     type node = Header.node
 
 	type next_t =
-		| Leaf of leaf
-		| NodeRef of ident
+		| Output	of int
+		| Leaf		of leaf
+		| NodeRef	of ident
 	type edge_t = edge * next_t
-	type node_t = node * (edge_t list)
-	
+	type node_r =
+		| Node		of node
+		| Graph		of edge_t
+	type node_t = node_r * (edge_t list)
+
 	type manager = {
-        unique : node_t H2Table.t;
+		unique : node_t H2Table.t
 	}
 
-    
+	let default_newman_hsize = 10000
 	let makeman hsize = {
         unique = H2Table.create hsize 0;
     }
@@ -84,6 +69,7 @@ struct
 			| None		-> (fun _ -> StrTree.of_unit())
 		in
 		let dump_next_t parcours = function
+			| Output idx -> [Tree.Leaf "Output"; StrTree.of_int idx]
 			| Leaf leaf -> [Tree.Leaf "Leaf"; dump_leaf leaf]
 			| NodeRef ident -> [Tree.Leaf "NodeRef"; StrTree.of_int ident]
 		in
@@ -92,9 +78,16 @@ struct
             function ((edge, next) : edge_t) ->
                 Tree.Node ((dump_edge edge)::(dump_next_t next))
 		in
+		let dump_node_r parcours =
+			let dump_edge_t = dump_edge_t parcours in
+			function
+				| Node	node -> Tree.Node [Tree.Leaf "Node"; dump_node node]
+				| Graph edge -> Tree.Node [Tree.Leaf "Graph"; dump_edge_t edge]
+		in
 		let dump_node_t parcours =
 			let dump_edge_t = dump_edge_t parcours in
-			function ((node, edges) : node_t) -> (dump_node node)::(List.map dump_edge_t edges)
+			let dump_node_r = dump_node_r parcours in
+			function ((node, edges) : node_t) -> (dump_node_r node)::(List.map dump_edge_t edges)
 		in fun udag edges ->
 			let memo = MemoTable.create (H2Table.length udag.unique) in
 			let apply = MemoTable.apply memo in
@@ -130,18 +123,33 @@ struct
 		match Header.load_node with
 			| None -> None
 			| Some load_node ->
-		let load_next getid = function
-			| [Tree.Leaf "Leaf"; leaf] -> Leaf (load_leaf leaf)
-			| [Tree.Leaf "NodeRef"; ident] ->
-					NodeRef (getid (StrTree.to_int ident))
+		let load_next_t getid = function
+			| [Tree.Leaf text; b] ->
+			(
+				match text with
+				| "Output"	-> Output (StrTree.to_int b)
+				| "Leaf"	-> Leaf (load_leaf b)
+				| "NodeRef"	-> NodeRef (getid(StrTree.to_int b))
+				| _ -> assert false
+			)
 			| _ -> assert false
 		in
-		let load_edge getid = function
-			| Tree.Node (edge::noderef) -> (load_edge edge, load_next getid noderef)
+		let load_edge_t getid = function
+			| Tree.Node (edge::noderef) -> (load_edge edge, load_next_t getid noderef)
 			| _ -> assert false
 		in
-		let load_node getid = function
-			| node::edges -> (load_node node, (List.map (load_edge getid) edges))
+		let load_node_r getid = function
+			| Tree.Node [Tree.Leaf tag; b] ->
+			(
+				match tag with
+				| "Node" -> Node (load_node b)
+				| "Graph" -> Graph (load_edge_t getid b)
+				| _ -> assert false
+			)
+			| _ -> assert false
+		in
+		let load_node_t getid = function
+			| node::edges -> (load_node_r getid node, (List.map (load_edge_t getid) edges))
 			| _ -> assert false
 		in Some (function
 			| Tree.Node [Tree.Node liste_nodes; Tree.Node liste_edges] ->
@@ -156,14 +164,14 @@ struct
 					| Tree.Node (ident::node) ->
 						let ident = StrTree.to_int ident in
 						assert(not(mem ident));
-						add ident ((load_node getid node)|>(push udag))
+						add ident ((load_node_t getid node)|>(push udag))
 					| _ -> assert false
 				in
 				List.iter load_node liste_nodes;
-				let liste_edges = List.map (load_edge getid) liste_edges in
+				let liste_edges = List.map (load_edge_t getid) liste_edges in
 				udag, liste_edges
 			)
 			| _ -> assert false
                 )
-
+	
 end
