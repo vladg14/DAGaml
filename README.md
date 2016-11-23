@@ -15,7 +15,7 @@ Implements syntactically canonical DAG: each node (edges' order included) is uni
 Implements syntactically canonical Recursive DAG, i.e. nodes are either regular nodes or a rooted DAGs themselves. Thus, we add a special kind of leaf called Output
 
 ## UBDAG(leaf, node)
-Implements Binary DAG using ephemeron to weakly record nodes in the unique table.
+Implements syntactically canonical Binary DAG using ephemeron to weakly record nodes in the unique table.
 Implements memoization facilities using weakly referenced inputs
 
 
