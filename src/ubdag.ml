@@ -7,38 +7,48 @@ module UBDAG(Header:HEADER) =
 struct
 	type ident = int
 
-	type tree =
+	type tree  =
 		| Leaf of Header.leaf
-		| Node of ident * node
-	and	 node = (Header.node * tree * tree)
+		| Node of pnode
+	and	 node  = (Header.node * tree * tree)
+	and  pnode = {ident : ident; node : node}
+
+	let get_ident pnode = pnode.ident
 	
 	let equal_tree x y = match x, y with
-		| Leaf leaf, Leaf leaf' -> leaf = leaf'
-		| Node (idx, _), Node (idx', _) -> idx = idx'
+		| Leaf x, Leaf y -> x = y
+		| Node x, Node y -> (x.ident = y.ident)&&(assert(x.node==y.node); true)
 		| _ -> false
 
 	let equal_node (d, t0, t1) (d', t0', t1') =
 		(d = d')&&(equal_tree t0 t0')&&(equal_tree t1 t1')
 
-	module HTree : Hashtbl.HashedType with type t = node =
+	module HNode : Hashtbl.HashedType with type t = node =
 	struct
 		type t = node
 		let equal = equal_node
 
 		let hash_tree = function
-			| Leaf leaf		-> Hashtbl.hash leaf
-			| Node (h, _)	-> h
+			| Leaf leaf	-> Hashtbl.hash leaf
+			| Node node -> node.ident
 		let hash (d, x, y) = Hashtbl.hash (d, hash_tree x, hash_tree y)
 	end
-	module Unique = Ephemeron.K1.Make(HTree)
+	module HPNode : Hashtbl.HashedType with type t = pnode =
+	struct
+		type t = pnode
+		let equal = (=)
+
+		let hash pnode = pnode.ident
+	end
+	module Unique : Hashtbl.S with type key = node = Ephemeron.K1.Make(HNode)
 	
 	type manager = {
-		ident : ident ref;
-		unique : tree Unique.t;
+		index  : ident ref;
+		unique : pnode Unique.t;
 	}
 
 	let makeman hsize = {
-		ident = ref 0;
+		index  = ref 0;
 		unique = Unique.create hsize;
 	}
 
@@ -50,14 +60,152 @@ struct
 			Unique.find man.unique node
 		with Not_found ->
 		(
-			let tree = Node (!(man.ident), node) in
-			incr (man.ident);
-			Unique.add man.unique node tree;
-			tree
+			let pnode = {ident = !(man.index); node = node} in
+			incr (man.index);
+			Unique.add man.unique node pnode;
+			pnode
 		)
 	
-	let pull man = function
-		| Leaf _ -> assert false
-		| Node (ident, node) -> node
+	let pull _ pnode = pnode.node
 	
+	module M2T(ODeco:Map.OrderedType) =
+	struct
+		module MemoNN = Ephemeron.K2.Make(HPNode)(HPNode)
+		module MemoD = Map.Make(ODeco) 
+		type deco = ODeco.t
+		type 'a nnd = HPNode.t -> HPNode.t -> MemoD.key -> 'a
+		type 'a manager = {
+			assoc  : (('a MemoD.t) ref MemoNN.t);
+			hitCnt : int ref;
+			clcCnt : int ref;
+		}
+
+		let makeman hsize = {
+			assoc  = MemoNN.create hsize;
+			hitCnt = ref 0;
+			clcCnt = ref 0;
+		}
+
+		let newman_default_hsize = 10000
+		
+		let newman () = makeman newman_default_hsize
+
+		let test man n0 n1 d =
+			try
+				MemoD.mem d (!(MemoNN.find man.assoc (n0, n1)))
+			with
+				Not_found -> false
+		
+		let push man n0 n1 d x =
+			try
+				let memoD = MemoNN.find man.assoc (n0, n1) in
+				memoD := (MemoD.add d x (!memoD));
+			with
+				Not_found ->
+					MemoNN.add man.assoc (n0, n1) (ref(MemoD.(empty |> add d x)));
+			()
+		
+		let pull man n0 n1 d =
+			try 
+				let memoD = !(MemoNN.find man.assoc (n0, n1)) in
+				Some(MemoD.find d memoD)
+			with
+				Not_found -> None
+
+		let apply man func n0 n1 =
+			let func = func n0 n1 in
+			let aux memoD d =
+				try
+				(
+					let x = MemoD.find d (!memoD) in
+					incr man.hitCnt;
+					x
+				)
+				with	Not_found ->
+				(
+					let x = func d in
+					incr man.clcCnt;
+					assert(not (MemoD.mem d (!memoD)));
+					memoD := (MemoD.add d x (!memoD));
+					x
+				)
+			in
+			try
+				aux (MemoNN.find man.assoc (n0, n1))
+			with
+				Not_found ->
+				let memoD = ref (MemoD.empty) in
+				MemoNN.add man.assoc (n0, n1) memoD;
+				aux memoD	
+	end
+	
+	module M1T(ODeco:Map.OrderedType) =
+	struct
+		module MemoN = Ephemeron.K1.Make(HPNode)
+		module MemoD = Map.Make(ODeco) 
+		type deco = ODeco.t
+		type 'a nd = HPNode.t -> deco -> 'a
+		type 'a manager = {
+			assoc  : (('a MemoD.t) ref MemoN.t);
+			hitCnt : int ref;
+			clcCnt : int ref;
+		}
+
+		let makeman hsize = {
+			assoc  = MemoN.create hsize;
+			hitCnt = ref 0;
+			clcCnt = ref 0;
+		}
+
+		let newman_default_hsize = 10000
+		
+		let newman () = makeman newman_default_hsize
+
+		let test man n d =
+			try
+				MemoD.mem d (!(MemoN.find man.assoc n))
+			with
+				Not_found -> false
+		
+		let push man n d x =
+			try
+				let memoD = MemoN.find man.assoc n in
+				memoD := (MemoD.add d x (!memoD));
+			with
+				Not_found ->
+					MemoN.add man.assoc n (ref(MemoD.(empty |> add d x)))
+		
+		let pull man n d =
+			try 
+				let memoD = !(MemoN.find man.assoc n) in
+				Some(MemoD.find d memoD)
+			with
+				Not_found -> None
+
+		let apply man func n =
+			let func = func n in
+			let aux memoD d =
+				try
+				(
+					let x = MemoD.find d (!memoD) in
+					incr man.hitCnt;
+					x
+				)
+				with	Not_found ->
+				(
+					let x = func d in
+					incr man.clcCnt;
+					assert(not (MemoD.mem d (!memoD)));
+					memoD := (MemoD.add d x (!memoD));
+					x
+				)
+			in
+			try
+				aux (MemoN.find man.assoc n)
+			with
+				Not_found ->
+				let memoD = ref (MemoD.empty) in
+				MemoN.add man.assoc n memoD;
+				aux memoD	
+	end
 end
