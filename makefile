@@ -6,7 +6,10 @@ NPROC=$(shell nproc)
 OB=ocamlbuild -j $(NPROC) -r $(LIBS) $(SRCS)
 
 all:
-	$(OB) test/test_udag.native test/test_urdag.native
+	$(OB) \
+		test/test_udag.native \
+		test/test_urdag.native \
+		test/test_ubdag.native
 
 clean:
 	ocamlbuild -clean
