@@ -5,6 +5,13 @@ val bool_of_string : string -> bool
 val pretty_of_bool : bool -> string
 val print_bool : bool -> unit
 
+val char_0 : int
+val char_9 : int
+val char_A : int
+val char_Z : int
+val char_a : int
+val char_z : int
+
 val explode: string -> char list
 val implode: char list -> string
 val catmap:  string -> ('a -> string) -> 'a list -> string

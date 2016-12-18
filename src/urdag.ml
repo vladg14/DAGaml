@@ -1,8 +1,7 @@
 (* URDAG : Unique Recursive - Directed Acyclic Diagramm
  *)
-open Udag
 module type RGRAPH = sig
-	include GRAPH_HEADER
+	include Udag.GRAPH_HEADER
 	type ident
 
 	type next_t =
@@ -22,7 +21,7 @@ module type RGRAPH = sig
 	val pull : manager -> ident -> node_t
 end
 
-module URDAG	(Header:UDAG_HEADER) =
+module URDAG	(Header:Udag.UDAG_HEADER) =
 struct
 	type ident = int
     

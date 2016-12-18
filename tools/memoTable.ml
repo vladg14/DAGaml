@@ -40,3 +40,10 @@ let print_stats mem =
 	print_int mem.clcCnt;
 	print_string	".\n";
 ;;
+
+let dump_stat mem = Tree.Node [
+		Tree.Node [Tree.Leaf "length:"; StrTree.of_int (Hashtbl.length (mem.table))];
+		Tree.Node [Tree.Leaf "hit count:"; StrTree.of_int mem.hitCnt];
+		Tree.Node [Tree.Leaf "clc count:"; StrTree.of_int mem.clcCnt];
+	]
+;;

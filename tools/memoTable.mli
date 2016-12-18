@@ -10,3 +10,4 @@ val pull : ('a, 'b) t -> 'a -> 'b
 val apply : ('a, 'b) t -> ('a -> 'b) -> 'a -> 'b
 	
 val print_stats : ('a, 'b) t -> unit
+val dump_stat : ('a, 'b) t -> StrTree.tree

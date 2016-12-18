@@ -22,8 +22,11 @@ let print_bool = function
 	| false	-> print_string "0"
 
 let char_0 = Char.code '0'
+let char_9 = Char.code '9'
 let char_A = Char.code 'A'
+let char_Z = Char.code 'Z'
 let char_a = Char.code 'a'
+let char_z = Char.code 'z'
 
 let explode s =
 	let rec exp i l =
