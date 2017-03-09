@@ -211,12 +211,15 @@ let compose'' gen' i next =
 	in aux i
 
 let ( $@++ ) i gen' next = compose'' gen' i next
+let ( $<++ ) n gen' next = compose'' gen' (range 0 n) next
 
 let compose' gen = compose'' (fun x next -> gen x $+ next)
 let ( $@+  ) i gen next = compose' gen i next
+let ( $<+  ) n gen next = compose' gen (range 0 n) next
 
 let compose gen i = compose' gen i stop
 let ( $@   ) i gen = compose gen i
+let ( $<   ) n gen = compose gen (range 0 n)
 
 let map_compose' f i j next = compose'' (fun x next -> map' (f x) j next) i next
 let ( $$@+ ) i f j next = map_compose' f i j next

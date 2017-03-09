@@ -1,6 +1,7 @@
 type ('a, 'b) t
 
 val create : int -> ('a, 'b)t
+val make   : int -> ('a, 'b)t * (('a -> 'b) -> 'a -> 'b)
 
 val test : ('a, 'b) t -> 'a -> bool
 val push : ('a, 'b) t -> 'a -> 'b -> unit

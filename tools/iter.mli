@@ -50,10 +50,13 @@ val add_snd'	: 'a iter -> 'b -> ('a * 'b) next
 val add_snd	: 'a iter -> 'b -> ('a * 'b) iter
 val compose'':('a -> 'b next) -> 'a iter -> 'b next
 val ( $@++) : 'a iter -> ('a -> 'b next) -> 'b next
+val ( $<++) :   int   -> (int -> 'b next) -> 'b next
 val compose': ('a -> 'b iter) -> 'a iter -> 'b next
 val ( $@+ )	: 'a iter -> ('a -> 'b iter) -> 'b next
+val ( $<+ ) :   int   -> (int -> 'b iter) -> 'b next
 val compose	: ('a -> 'b iter) -> 'a iter -> 'b iter
 val ( $@ )	: 'a iter -> ('a -> 'b iter) -> 'b iter
+val ( $< )  :   int	  -> (int -> 'b iter) -> 'b iter
 val map_compose'	: ('a -> 'b -> 'c) -> 'a iter -> 'b iter -> 'c next
 val map_compose		: ('a -> 'b -> 'c) -> 'a iter -> 'b iter -> 'c iter
 val ( $*+ )	: 'a iter -> 'b iter -> ('a * 'b) next

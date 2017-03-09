@@ -1,5 +1,7 @@
 type ('a, 'b) ab = A of 'a | B of 'b
 
+let mapreduce map reduce init liste = List.fold_left (fun x y -> reduce x (map y)) init liste
+
 let cmp a b =
 	if (a = b)
 		then 0
@@ -8,7 +10,9 @@ let cmp a b =
 		else (-1)
 
 
-let cswap c (a, b) = if c then (a, b) else (b, a)
+let cswap c (a, b) = if c then (b, a) else (a, b)
+let op2 op (a, b) = (op a, op b)
+let opop (opa, opb) (a, b) = (opa a, opb b)
 
 let cond_fun = function
 	| true	-> (fun f x -> f x)
@@ -67,11 +71,11 @@ let rec math_pow x = function
 
 let math_log x =
 	let rec aux = function
-		| 0 -> assert false
+	(*	| n when n <= 0	-> assert false *)
 		| 1 -> 0
 		| n when n < x	-> 1
 		| n				-> 1+(aux (n/x))
-	in aux
+	in (fun x -> assert(x > 0); aux x)
 
 let string_of_option string_of = function
 	| None -> "None"
@@ -82,3 +86,10 @@ let string_of_option string_of = function
 let check func objet =
 	assert(func objet);
 	objet
+
+let bin_of_int =
+	let rec aux x =
+		if x = 0
+		then []
+		else (x mod 2 = 1) :: ( aux (x/2) )
+	in (fun x -> assert(x>=0); Array.of_list (aux x))

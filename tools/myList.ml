@@ -3,10 +3,16 @@ open Extra
 let list_init n f =
 	assert(n>=0);
 	let rec aux carry = function
-		| 0 -> List.rev carry
+		| 0 -> carry
 		| n -> aux ((f(n-1))::carry) (n-1)
 	in aux [] n
 
+let init = list_init
+
+let catlist (cat: 'a) : 'a list list -> 'a list = function
+	| [] -> []
+	| [x] -> x
+	| x::x' -> x@(List.flatten (List.map (fun (x:'a list) -> cat::x) x'))
 
 let option_cons = function
 	| None -> (fun l -> l)
@@ -34,6 +40,7 @@ let list_of_oplistv4 =
 let list_of_oplist = list_of_oplistv4
 
 let opmap opfun liste = list_of_oplist (List.map opfun liste)
+let opmap2 opfun liste1 liste2 = list_of_oplist (List.map2 opfun liste1 liste2)
 
 let sum = List.fold_left (+) 0
 
@@ -123,12 +130,12 @@ let list_index item =
 			else (aux (pos+1) tail)
 	in aux 0
 
-let list_hdtl = function
+let hdtl = function
 	| []	-> assert false
 	| x::y	-> x, y
 
-let lists_hdtl vects =
-	List.split (List.map list_hdtl vects)
+let map_hdtl vects =
+	List.split (List.map hdtl vects)
 
 
 let hdtl_nth n liste =
@@ -242,3 +249,12 @@ let list_iterative_reduction func =
 			| Some obj'	-> aux carry' obj'
 			| None		-> List.rev carry'
 	in aux []
+
+let last =
+	let rec aux carry = function
+		| []			-> assert false
+		| [x]			-> List.rev carry, x
+		| head::tail	-> aux (head::carry) tail
+	in function
+		| [] -> assert false
+		| liste -> aux [] liste
