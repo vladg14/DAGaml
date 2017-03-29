@@ -20,6 +20,7 @@ val pow_ii : int -> int -> big_int
 val pow_bi : big_int -> int -> big_int
 val pow_ib : int -> big_int -> big_int
 val pow : big_int -> big_int -> big_int
+val pow2 : int -> big_int
 val sign : big_int -> int
 val compare : big_int -> big_int -> int
 val ( = ) : big_int -> big_int -> bool

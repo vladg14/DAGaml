@@ -92,6 +92,8 @@ struct
 			| Utils.Node p -> f(G.pull man p)
 
 	let compose = M.compose G.get_ident
+
+	let dump_stat = G.dump_stat
 	
 
 	module type MODELE_NODE_VISITOR =

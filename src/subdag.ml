@@ -115,6 +115,8 @@ struct
 			| Utils.Node p -> f(G.pull man p)
 
 	let compose = M.compose G.get_ident
+		
+	let dump_stat = G.dump_stat
 
 	module type MODELE_NODE_VISITOR =
 	sig
@@ -523,4 +525,62 @@ struct
 			Tree.Node [Tree.Leaf "memo:"; MemoTable.dump_stat man.memo];
 		]
 	end
+
+	module type MODELE_EVAL =
+	sig
+		type pars
+		type back
+		val pars : (G.pnode -> G.ident) -> pars -> edge -> (
+			edge,
+			back * pars,
+			back * pars,
+			back * pars * pars ) Utils.binpull
+		val back : (G.pnode -> G.ident) -> back -> edge -> edge
+	end
+
+	module EVAL(D0 : MODELE_EVAL) =
+	struct
+		type memo = {
+			man  : manager;
+			calc : D0.pars -> edge -> edge;
+			memo : (D0.pars * edge, edge) MemoTable.t;
+		}
+
+		type manager = memo
+		
+		let makeman man hsize=
+			let memo, apply = MemoTable.make hsize in
+			let push = push man
+			and pull = pull man in
+			let rec calcrec (pars:D0.pars) (e:edge) = apply (fun (pars, e) -> match D0.pars G.get_ident pars e with
+				| Utils.MStop e -> e
+				| Utils.Go0 (b, p) ->
+				(
+					let e0, _ = pull e in
+					D0.back G.get_ident b (calcrec p e0)
+				)
+				| Utils.Go1 (b, p) ->
+				(
+					let _, e1 = pull e in
+					D0.back G.get_ident b (calcrec p e1)
+				)
+				| Utils.MPull (b, p0, p1) ->
+				(
+					let e0, e1 = pull e in
+					D0.back G.get_ident b (push (calcrec p0 e0) (calcrec p1 e1))
+				)
+			) (pars, e)
+			in
+			{
+				man  = man;
+				calc = calcrec;
+				memo = memo;
+			}, calcrec
+		let newman man = makeman man 10000
+		let calc man = man.calc
+		let dump_stat man = Tree.Node [
+			Tree.Node [Tree.Leaf "memo:"; MemoTable.dump_stat man.memo];
+		]
+	end
+
 end

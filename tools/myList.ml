@@ -54,6 +54,8 @@ let ntimes x =
 		| n -> aux (x::carry) (n-1)
 	in aux []
 
+let make n x = ntimes x n
+
 let ncopy x =
 	let rec aux carry = function
 		| 0 -> carry

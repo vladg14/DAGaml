@@ -68,6 +68,13 @@ struct
 	let pull udag = H2Table.pull udag.unique
 	
 	let length udag = H2Table.length udag.unique
+
+	let dump_stat udag = Tree.Node [
+		Tree.Leaf "#node: ";
+		Tree.Node [
+			StrTree.of_int(H2Table.length udag.unique)
+		]
+	]
 	
 	let dump =
 		let dump_leaf = match Header.dump_leaf with

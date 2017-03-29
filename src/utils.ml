@@ -11,3 +11,11 @@ type ('tag, 'edge, 'node) unmerge_tagged = ('tag * 'edge * 'edge, 'node) pull_re
 type ('leaf, 'node) gnode =
 	| Leaf of 'leaf
 	| Node of 'node
+
+type ('stop, 'left, 'right, 'both) binpull =
+	| MStop of 'stop
+	| Go0   of 'left
+	| Go1   of 'right
+	| MPull	of 'both
+
+type ('return, 'edge, 'node) binpath = ('return, 'edge -> 'return, 'edge -> 'return, 'node -> 'return) binpull

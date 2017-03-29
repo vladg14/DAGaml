@@ -59,6 +59,7 @@ let of_string_sys = Big_int.sys_big_int_of_string;;
 let round_futur_last_digit = Big_int.round_futur_last_digit;;
 let approx = Big_int.approx_big_int;;
 let print big_int = print_string (to_string big_int);;
+let pow2 n = shift_left unit n;;
 
 let gaussbino q r m =
 	let rec aux = function

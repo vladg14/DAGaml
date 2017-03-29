@@ -12,6 +12,14 @@ let bitv size stream =
 	let x, stream = MyList.hdtl_nth size stream in
 	(Bitv.L.of_bool_list x), stream
 
+let none_list load =
+	let rec aux carry stream =
+		let opelem, stream = load stream in
+		match opelem with
+		| None -> carry, stream
+		| Some elem -> aux (elem::carry) stream
+	in aux []
+
 let while_list func init =
 	let rec aux carry state stream =
 		let op_elem_op_state, stream = func stream in
@@ -44,3 +52,18 @@ let list load =
 let bool = function
 	| b::stream -> b, stream
 	| _			-> assert false
+
+let unary =
+	let rec aux n = function
+		| [] -> assert false
+		| head::stream -> if head then (n, stream) else (aux (n+1) stream)
+	in aux 0
+
+let int stream =
+	let k, stream = unary stream in
+	let l, stream = MyList.hdtl_nth k stream in
+	let rec aux x = function
+		| [] -> x
+		| head::tail -> aux (x*2 + (if head then 1 else 0)) tail
+	in (aux 0 l), stream
+	
