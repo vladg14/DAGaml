@@ -19,3 +19,8 @@ type ('stop, 'left, 'right, 'both) binpull =
 	| MPull	of 'both
 
 type ('return, 'edge, 'node) binpath = ('return, 'edge -> 'return, 'edge -> 'return, 'node -> 'return) binpull
+
+type ('edge, 'cons, 'node) merge3 =
+	| M3Edge of 'edge
+	| M3Cons of 'cons
+	| M3Node of 'node

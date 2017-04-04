@@ -93,3 +93,7 @@ let bin_of_int =
 		then []
 		else (x mod 2 = 1) :: ( aux (x/2) )
 	in (fun x -> assert(x>=0); Array.of_list (aux x))
+
+let unop = function
+	| None -> assert false
+	| Some x -> x

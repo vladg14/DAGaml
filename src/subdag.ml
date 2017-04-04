@@ -13,7 +13,7 @@ module type MODELE = sig
 	val pull : ('t -> 'i) -> 't e -> ('t e, 't n) unmerge
 
 	val pull_node : ('t -> 'i) -> 't n -> 't e * 't e
-	val compose : ('t -> 'i) -> edge -> 't e -> 't e	
+	val compose : edge -> 't e -> 't e	
 	
 	val dump_leaf : (leaf -> StrTree.tree) option
 	val load_leaf : (StrTree.tree -> 't e) option
@@ -114,7 +114,7 @@ struct
 			| Utils.Leaf _ -> assert false
 			| Utils.Node p -> f(G.pull man p)
 
-	let compose = M.compose G.get_ident
+	let compose = M.compose
 		
 	let dump_stat = G.dump_stat
 
@@ -525,6 +525,124 @@ struct
 			Tree.Node [Tree.Leaf "memo:"; MemoTable.dump_stat man.memo];
 		]
 	end
+	
+	module type MODELE_IBOP_EVAL =
+	(* Internal Binary OPerator *)
+	sig
+		type compact
+		type residual
+		type eval
+
+		val  solver : (G.pnode -> G.ident) -> edge -> edge -> (
+			M.edge * ((eval option) * G.tree),
+			M.edge * ((M.edge * (eval option * G.tree)) * (M.edge * (eval option * G.tree))),
+			residual * ( compact * ((eval option) * G.tree) * ((eval option) * G.tree))) Utils.merge3
+
+		val solver' : (G.pnode -> G.ident) -> compact -> (edge, G.tree) Utils.merge -> (edge, G.tree) Utils.merge -> (
+			M.edge * ((eval option) * G.tree),
+			M.edge * ((M.edge * (eval option * G.tree)) * (M.edge * (eval option * G.tree))),
+			residual * ( compact * ((eval option) * G.tree) * ((eval option) * G.tree))) Utils.merge3
+
+		val eval : eval -> edge -> M.edge * ((eval option) * G.tree) (* apply the evaluation sequence on the descriptor *)
+
+		val read : eval -> (unit, eval, eval, eval * eval) Utils.binpull (* read the first symbole of the evaluation sequence *)
+		
+		val  decomp : G.tree -> G.tree -> compact -> edge * edge
+		val compose : residual -> edge -> edge
+	end
+	
+	module IBOP_EVAL(D0:MODELE_IBOP_EVAL) =
+	(* Internal Binary OPerator *)
+	struct
+		type memo = {
+			man  : manager;
+			calc : edge -> edge -> edge;
+			memo : (D0.compact * G.tree * G.tree, edge) MemoTable.t;
+			eval : (D0.eval    * G.tree         , edge) MemoTable.t;
+
+		}
+
+		type manager = memo
+		
+		let makeman man hsize =
+			let memo, apply = MemoTable.make hsize in
+			let memo_eval, apply_eval = MemoTable.make hsize in
+			let push = push man
+			and pull = pull man
+			and pull_node = function
+				| Utils.Leaf _		-> assert false
+				| Utils.Node node	-> pull_node man node in
+			let rec	read (set:D0.eval) (gtree:G.tree) =
+				apply_eval (fun (set, gtree) -> match D0.read set with
+				| Utils.MStop () -> assert false
+				| Utils.Go0 set ->
+				(
+					let edge, _ = pull_node gtree in
+					eval set edge
+				)
+				| Utils.Go1 set ->
+				(
+					let _, edge = pull_node gtree in
+					eval set edge
+				)
+				| Utils.MPull (set0, set1) ->
+				(
+					let edge0, edge1 = pull_node gtree in
+					push (eval set0 edge0) (eval set1 edge1)
+				)
+			) (set, gtree)
+			and		eval (set:D0.eval) (edge:edge) =
+				let edge, (opset, gtree) = D0.eval set edge in
+				match opset with
+				| None -> ((edge, gtree):edge)
+				| Some set -> compose edge (read set gtree)
+			in
+			let eval_eog (edge, (opset, gtree)) : edge = match opset with
+				| None     -> (edge, gtree)
+				| Some set -> compose edge (read set gtree)
+			in
+			let rec calcrec (edgeX:edge) (edgeY:edge) = match D0.solver G.get_ident edgeX edgeY with
+				| Utils.M3Edge eog -> eval_eog eog
+				| Utils.M3Cons (edge, (eogX, eogY)) -> compose edge (push (eval_eog eogX) (eval_eog eogY))
+				| Utils.M3Node (residual, (compact, nodeX, nodeY)) -> ((D0.compose residual (propa compact nodeX nodeY)):edge)
+			and		propa compact (opevaX, gtreeX) (opevaY, gtreeY) = 
+				if opevaX = None && opevaY = None
+				then
+				(
+(*					print_string "{SUBDAG.IBOP_EVAL} opevax = None && opevay = None"; print_newline();*)
+					apply calc (compact, gtreeX, gtreeY)
+				)
+				else
+				(
+(*					print_string "{SUBDAG.IBOP_EVAL} not(opevax = None && opevay = None)"; print_newline();*)
+					let edgeX = match opevaX with None -> Utils.MNode gtreeX | Some set -> Utils.MEdge (read set gtreeX)
+					and edgeY = match opevaY with None -> Utils.MNode gtreeY | Some set -> Utils.MEdge (read set gtreeY) in
+					match D0.solver' G.get_ident compact edgeX edgeY with
+					| Utils.M3Edge eog -> eval_eog eog
+					| Utils.M3Cons (edge, (eogX, eogY)) -> compose edge (push (eval_eog eogX) (eval_eog eogY))
+					| Utils.M3Node (residual, (compact, nodeX, nodeY)) -> D0.compose residual (propa compact nodeX nodeY)
+				)
+			and		calc (compact, gtreeX, gtreeY) =
+				let fx, fy = D0.decomp gtreeX gtreeY compact in
+				let fx0, fx1 = pull fx
+				and fy0, fy1 = pull fy in
+				let f0 = calcrec fx0 fy0
+				and f1 = calcrec fx1 fy1 in
+				push f0 f1
+		in
+		{
+			man  = man;
+			calc = calcrec;
+			memo = memo;
+			eval = memo_eval;
+		}, calcrec
+		let newman man = makeman man 10000
+		let calc man = man.calc
+		let dump_stat man = Tree.Node [
+			Tree.Node [Tree.Leaf "memo:"; MemoTable.dump_stat man.memo];
+			Tree.Node [Tree.Leaf "eval:"; MemoTable.dump_stat man.eval];
+		]
+	end
 
 	module type MODELE_EVAL =
 	sig
@@ -535,7 +653,7 @@ struct
 			back * pars,
 			back * pars,
 			back * pars * pars ) Utils.binpull
-		val back : (G.pnode -> G.ident) -> back -> edge -> edge
+		val back : back -> edge -> edge
 	end
 
 	module EVAL(D0 : MODELE_EVAL) =
@@ -550,24 +668,28 @@ struct
 		
 		let makeman man hsize=
 			let memo, apply = MemoTable.make hsize in
+			let apply f x = f x in
 			let push = push man
-			and pull = pull man in
-			let rec calcrec (pars:D0.pars) (e:edge) = apply (fun (pars, e) -> match D0.pars G.get_ident pars e with
+			and pull = function
+				| Utils.Leaf _    -> assert false
+				| Utils.Node node -> pull_node man node
+			in
+			let rec calcrec (pars:D0.pars) (e:edge) = apply (fun (pars, ((ex, ix) as e)) -> match D0.pars G.get_ident pars e with
 				| Utils.MStop e -> e
 				| Utils.Go0 (b, p) ->
 				(
-					let e0, _ = pull e in
-					D0.back G.get_ident b (calcrec p e0)
+					let e0, _  = pull ix in
+					D0.back b (calcrec p e0)
 				)
 				| Utils.Go1 (b, p) ->
 				(
-					let _, e1 = pull e in
-					D0.back G.get_ident b (calcrec p e1)
+					let _ , e1 = pull ix in
+					D0.back b (calcrec p e1)
 				)
 				| Utils.MPull (b, p0, p1) ->
 				(
-					let e0, e1 = pull e in
-					D0.back G.get_ident b (push (calcrec p0 e0) (calcrec p1 e1))
+					let e0, e1 = pull ix in
+					D0.back b (push (calcrec p0 e0) (calcrec p1 e1))
 				)
 			) (pars, e)
 			in
