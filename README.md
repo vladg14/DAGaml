@@ -1,23 +1,11 @@
 # DAGaml
 Abstract manipulations of Directed Acyclic Graph (DAG) using OCaml.
 
+
 https://en.wikipedia.org/wiki/Directed_acyclic_graph
 
+
 https://ocaml.org/
-
-# Implementation
-DAGaml implements various kinds of DAG such as UDAG, URDAG, UBDAG
-
-## UDAG(leaf, edge, node)
-Implements syntactically canonical DAG: each node (edges' order included) is unique in the data structure
-
-## URDAG(leaf, edge, node)
-Implements syntactically canonical Recursive DAG, i.e. nodes are either regular nodes or a rooted DAGs themselves. Thus, we add a special kind of leaf called Output
-
-## UBDAG(leaf, node)
-Implements syntactically canonical Binary DAG using ephemeron to weakly record nodes in the unique table.
-Implements memoization facilities using weakly referenced inputs
-Remarq : This module does not support data on edges, such data can be move to their parent's node's data field. This transformation is reversible as edges are ordered and the graph is directed.
 
 
 # Why ?
