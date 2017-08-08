@@ -16,7 +16,9 @@ val explode: string -> char list
 val implode: char list -> string
 val catmap:  string -> ('a -> string) -> 'a list -> string
 
-val index: char -> string -> int option
+val index: string -> char -> int option
+val index_from: string -> int -> char -> int option
 val split: char -> string -> string list
 
 val ntimes : string -> int -> string
+val print_stream : bool list -> unit
