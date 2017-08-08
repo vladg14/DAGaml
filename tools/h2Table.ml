@@ -29,9 +29,9 @@ let pull tbl indx =
 	else failwith "H2Table - undefined index";;
 
 let length tbl =
-	Hashtbl.length (tbl.access)
+	Hashtbl.length tbl.access
 ;;
 
 let iter tbl fonc =
-	Hashtbl.iter fonc (tbl.access);
+	Hashtbl.iter fonc tbl.access;
 ;;

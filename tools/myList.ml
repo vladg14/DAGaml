@@ -18,6 +18,7 @@ let option_cons = function
 	| None -> (fun l -> l)
 	| Some x -> (fun l -> (x::l))
 
+let catmap f l = List.flatten (List.map f l)
 
 let list_of_oplistv0 opel = List.fold_right option_cons opel []
 
@@ -39,14 +40,18 @@ let list_of_oplistv4 =
 
 let list_of_oplist = list_of_oplistv4
 
+let unop = list_of_oplist
+
 let opmap opfun liste = list_of_oplist (List.map opfun liste)
 let opmap2 opfun liste1 liste2 = list_of_oplist (List.map2 opfun liste1 liste2)
 
 let sum = List.fold_left (+) 0
 
 let count f l = sum(l||>(fun x -> if f x then 1 else 0))
+let counti f l = sum(List.mapi (fun i x -> if (f i x) then 1 else 0)l)
 
 let count_true = count (fun x -> x)
+let counti_true = counti (fun _ x -> x)
 
 let ntimes x =
 	let rec aux carry = function
@@ -130,6 +135,23 @@ let list_index item =
 			if item=head
 			then Some pos
 			else (aux (pos+1) tail)
+	in aux 0
+
+let index p =
+	let rec aux pos = function
+		| [] -> None
+		| head::tail ->
+			if p head
+			then Some pos
+			else (aux(pos+1) tail)
+	in aux 0
+
+let ifind (p : 'a -> 'b option) : 'a list -> (int * 'b) option =
+	let rec aux pos = function
+		| [] -> None
+		| head::tail -> match p head with
+			| None -> aux (pos+1) tail
+			| Some obj -> Some(pos, obj)
 	in aux 0
 
 let hdtl = function
@@ -216,12 +238,13 @@ let indexify_true = indexify (fun x -> x)
 let foldmap func check init =
 	let rec aux carry fold = function
 		| [] -> (List.rev carry, fold)
-		| head::tail ->	(
+		| head::tail ->
+		(
 			(*(check fold) is true*)
-			let head', fold' = func head fold in
+			let head', fold' = func fold head in
 			assert(check fold');
 			aux (head'::carry) fold' tail
-						)
+		)
 	in
 	assert(check init);
 	aux [] init
@@ -260,3 +283,7 @@ let last =
 	in function
 		| [] -> assert false
 		| liste -> aux [] liste
+
+let setnth liste x e =
+	assert(0 <= x && x < (List.length liste));
+	List.mapi (fun i -> if i = x then (fun _ -> e) else (fun y -> y)) liste

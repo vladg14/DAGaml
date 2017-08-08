@@ -26,7 +26,14 @@ let load_leaf strlist =
 
 let rec dump_tree = function
 	| Tree.Leaf text -> dump_leaf text
-	| Tree.Node treelist -> String.concat " " ("("::(List.map dump_tree treelist)@[")"])
+	| Tree.Node treelist -> String.concat " " ("("::(treelist ||> dump_tree)@[")"])
+
+let smart_dump_tree print =
+	let rec aux = function
+		| Tree.Leaf text -> print(dump_leaf text)
+		| Tree.Node treelist -> print "( "; List.iter (fun tree -> aux tree; print " ") treelist; print " )";
+	in aux
+
 
 let rec load_tree strlist =
 	let rec aux carry = function
@@ -43,7 +50,7 @@ let dump treelist = StrUtil.catmap "\n" dump_tree treelist
 let dumpfile treelist target =
 	let file = open_out target in
 	let output_string = output_string file in
-	List.iter (fun tree -> output_string (dump_tree tree); output_string "\n";) treelist;
+	List.iter (fun tree -> smart_dump_tree output_string tree; output_string "\n") treelist;
 	close_out file;
 	()
 
@@ -63,17 +70,23 @@ let load text =
 	in aux [] strlist
 
 let loadfile target =
-	let file = open_in target in
+	let stream = Stream.of_channel (open_in target) in
+	StrTreeParser.str_tree_parser stream
+(*	let file = open_in target in
 	let read() =
 		try Some(input_line file)
-		with End_of_file -> None
+		with End_of_file ->
+		(
+			close_in file;
+			None
+		)
 	in
 	let rec loop carry = match read () with
 		| Some line -> loop (line::carry)
 		| None -> String.concat "\n" (List.rev carry)
 	in
 	load (loop [])
-
+*)
 		
 
 let to_pretty =

@@ -129,6 +129,12 @@ let enumerate n i =
 	in
 	aux n i
 
+let progress step n i =
+	let rec aux n i () = match i() with
+		| Stop -> (print_int n; print_newline(); Stop)
+		| Elem(x, i') -> ((if n mod step = 0 then (print_int n; print_string "\r"; flush stdout)); Elem(x, aux (n+1) i'))
+	in aux n i
+
 let iter_while f x0 =
 	let rec aux x () = match f x with
 		| None		-> Stop

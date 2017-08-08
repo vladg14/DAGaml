@@ -8,8 +8,8 @@ let bool_of_char = function
 	| '0'	-> false
 	| _		-> failwith "[tools/strUtil] bool parsing failure - 7"
 let string_of_bool = function
-	| true	-> "1"
-	| false	-> "0"
+	| true	-> "true"
+	| false	-> "false"
 let pretty_of_bool = function
 	| true	-> "1"
 	| false	-> "."
@@ -40,20 +40,36 @@ let implode l =
 		| c :: l -> Bytes.set res i c; imp (i + 1) l
 	in imp 0 l
 
-let catmap s f l = String.concat s (List.map f l)
+let catmap s f l = String.concat s (Extra.(l ||> f))
 
-let index c s =
-	try	 Some (String.index s c)
+let index s c =
+	try               Some (String.index s c)
 	with Not_found -> None
 
-let split c s =
-	let rec aux s = match index c s with
-		| Some i ->	(
-			let l = String.sub s 0 i
-			and r = String.sub s (i+1) ((String.length s)-(i+1)) in
-			l::(aux r)
-					)
-		| None -> [s]
-	in aux s
+let index_from s i c =
+	try               Some(String.index_from s i c)
+	with Not_found -> None
+
+let split (c:char) (s:string) : string list =
+	let n = String.length s in
+	let rec aux carry i =
+		if i >= n then (List.rev carry) else (
+		match index_from s i c with
+			| Some j ->
+			(
+				assert(i >= 0 && i < n);
+				assert(j >= i && j < n);
+				let str = String.sub s i (j-i) in
+				aux (str::carry) (j+1)
+			)
+			| None ->
+			(
+				let str = String.sub s i (n-i) in
+				List.rev (str::carry)
+			)
+		)
+	in aux [] 0
 
 let ntimes s n = String.concat "" (MyList.ntimes s n)
+
+let print_stream stream = print_string(catmap "" Tools.string_of_bool stream)
