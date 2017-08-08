@@ -31,7 +31,7 @@ let list_of_oplistv3 =
 		| (Some item)::oplist' -> item::(aux oplist')
 	in aux
 
-let list_of_oplistv4 =
+let list_of_oplistv4 : 'a option list -> 'a list =
 	let rec aux carry = function
 		| [] -> List.rev carry
 		| None::oplist' -> aux carry oplist'

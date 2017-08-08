@@ -129,6 +129,14 @@ let to_option to_a = function
 	| _				->	assert false
 
 
+let of_list of_a liste = Tree.Node (List.map of_a liste)
+let to_list to_a = function
+	| Tree.Node liste -> List.map to_a liste
+	| Tree.Leaf _ -> assert false
+
+let of_array of_a array = of_list of_a (Array.to_list array)
+let to_array to_a stree = Array.of_list (to_list to_a stree)
+
 
 
 (* get colored version of str *)
