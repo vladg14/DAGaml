@@ -1,5 +1,10 @@
 type ('a, 'b) ab = A of 'a | B of 'b
 
+let isSome  = function Some _ -> true  | None -> false
+let isNone  = function Some _ -> false | None -> true
+let isOk    = function Ok _ -> true  | Error _ -> false
+let isError = function Ok _ -> false | Error _ -> true
+
 let mapreduce map reduce init liste = List.fold_left (fun x y -> reduce x (map y)) init liste
 
 let cmp a b =
@@ -80,6 +85,15 @@ let rec math_pow = function
 		| n when n mod 2 = 0	-> math_pow (x*x) (n/2)
 		| n						-> x*(math_pow (x*x) (n/2))
 	)
+
+let quick_pow (unit : 'a) (( * ) : 'a -> 'a -> 'a) (x : 'a) (k : int) : 'a =
+	let rec aux = function
+		| 0 -> (fun _ -> unit)
+		| 1 -> (fun x -> x   )
+		| n when n mod 2 = 0 -> (fun x ->       aux (n/2) (x*x)   )
+		| n                  -> (fun x -> x * ( aux (n/2) (x*x) ) )
+	in
+	aux k x
 
 let math_log x =
 	let rec aux = function

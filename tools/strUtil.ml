@@ -28,12 +28,12 @@ let char_Z = Char.code 'Z'
 let char_a = Char.code 'a'
 let char_z = Char.code 'z'
 
-let explode s =
+let explode (s : string) : char list =
 	let rec exp i l =
 		if i < 0 then l else exp (i - 1) (s.[i] :: l)
 	in exp (String.length s - 1) []
 
-let implode l =
+let implode (l : char list) : string =
 	let res = Bytes.create (List.length l) in
 	let rec imp i = function
 		| [] -> res

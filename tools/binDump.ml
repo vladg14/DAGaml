@@ -1,3 +1,5 @@
+let unit : unit BinUtils.dump = fun () stream -> stream
+
 let option dump opx stream = match opx with
 	| None -> false::stream
 	| Some x -> true::(dump x stream)
@@ -43,6 +45,19 @@ let sized_int size n stream : bool list =
 		assert(false)
 	))
 
-let pair dumpA dumpB (a, b) stream = dumpA a (dumpB b stream)
 
-	
+let pair dumpA dumpB (a, b) stream = dumpA a (dumpB b stream)
+let trio dumpA dumpB dumpC (a, b, c) stream = dumpA a (dumpB b (dumpC c stream))
+
+let closure dump objet = dump objet [] |> Bitv.L.of_bool_list
+
+let list dump liste stream = int (List.length liste) (sized_list dump liste stream)
+
+let array dump vect stream = list dump (Array.to_list vect) stream
+
+let bool_option_list = none_list (fun elem stream -> match elem with
+	| Some (Some b) -> false::b    ::stream
+	| Some  None    -> true ::false::stream
+	| None          -> true ::true ::stream)
+
+let o3 = fst

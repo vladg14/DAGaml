@@ -2,6 +2,7 @@ type 'a iter = 'a Iter.iter
 type 'a next = 'a Iter.iter -> 'a Iter.iter
 	
 let ( $$   ) = (Iter.( $$ )  : 'a iter -> ('a -> 'b) -> 'b iter			)
+let ( $?   ) = (Iter.( $? )  : 'a iter -> ('a -> 'b option) -> 'b iter	)
 let ( $$+  ) = (Iter.( $$+ ) : 'a iter -> ('a -> 'b) -> 'b next			)
 let ( $!   ) = (Iter.( $! )  : 'a iter -> ('b -> 'a -> 'b) -> 'b -> 'b	)
 let ( $!!  ) = (Iter.( $!! ) : 'a iter -> ('a -> 'a -> 'a) -> 'a option	)

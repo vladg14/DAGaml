@@ -5,6 +5,7 @@ val range	: int -> int -> int iter
 
 val map		: ('a -> 'b) -> 'a iter -> 'b iter
 val ( $$  )	: 'a iter -> ('a -> 'b) -> 'b iter
+val ( $? )  : 'a iter -> ('a -> 'b option) -> 'b iter
 
 val map'	: ('a -> 'b) -> 'a iter -> 'b next
 val ( $$+ )	: 'a iter -> ('a -> 'b) -> 'b next
@@ -28,7 +29,7 @@ val fill_None_partial	: 'a option iter -> 'a option iter -> 'a option iter
 val fill_None_default	: 'a -> 'a option iter -> 'a iter
 val zip	: 'a iter -> 'b iter -> ('a * 'b) iter
 val enumerate	: int -> 'a iter -> (int * 'a) iter
-val progress : int -> int -> 'a iter -> 'a iter
+val progress : string -> int -> int -> 'a iter -> 'a iter
 val iter_while	: ('a -> 'a option) -> 'a -> 'a iter
 val iter_fold	: ('a -> ('a * 'b) option) -> 'a -> 'b iter
 val unop	: 'a option iter -> 'a iter
