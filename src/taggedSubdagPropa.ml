@@ -2,20 +2,39 @@ module type MODELE = sig
 	type leaf
 	type edge
 	type node
+	type eval
 	type tag
+	
+	type 't next'  = (leaf, 't) Utils.gnode
+	type 't node'  = node * 't next' * 't next'
+	type 't edge'  = edge * 't next'
+	type 't edge'' = edge * 't node'
 
-	type 't gn = (leaf, 't) Utils.gnode
-	type 't n = node * 't gn * 't gn
-	type 't e = edge * 't gn
+	type 't t_node = (unit, node, leaf, 't) Utils.node
+	type 't t_edge = edge * 't t_node
 
-	val push : ('t -> 'i) -> tag -> 't e -> 't e -> ('t e, (edge * 't n)) Utils.merge
-	val pull : ('t -> 'i) -> 't e -> (tag, 't e, 't n) Utils.unmerge_tagged
+	type 't p_node = (edge,  tag, leaf, eval option * 't) Utils.node
+	type 't p_edge = edge * 't p_node
 
-	val pull_node : ('t -> 'i) -> 't n -> tag * 't e * 't e
-	val compose : edge -> 't e -> 't e	
+	type 't pt_node = ('t p_node, 't t_node) Utils.pt_node
+	type 't pt_edge = edge * 't pt_node
+
+	val push : ('t -> 'i) -> tag -> 't edge' -> 't edge' -> 't pt_edge
+	val pull : ('t -> 'i) -> 't node' -> tag * 't edge' * 't edge'
+
+	val arity_leaf : leaf -> int
+	val arity_edge : edge -> int
+	val arity_node : node -> int
+
+	val edge_of_arity : int -> edge
+
+	val eval_node : eval -> 't node' -> 't pt_edge
+	val eval_edge : eval -> 't edge' -> 't pt_edge
+
+	val compose : edge -> 't edge' -> 't edge'
 	
 	val dump_leaf : (leaf -> StrTree.tree) option
-	val load_leaf : (StrTree.tree -> 't e) option
+	val load_leaf : (StrTree.tree -> 't edge') option
 	val dot_of_leaf : (leaf -> string) option
 
 	val dump_edge : (edge -> StrTree.tree) option
@@ -53,7 +72,7 @@ struct
 
 		let push = M0.push
 		let pull = M0.pull
-		let pull_node = M0.pull_node
+		let pull_node = M0.pull
 		let compose = M0.compose
 		
 		let dump_leaf = None
@@ -73,27 +92,71 @@ struct
 	
 	type edge = M.edge * G.tree
 	
-	type manager = G.manager
+	type manager = {
+		gman : G.manager;
+		push : M0.tag -> edge -> edge -> edge;
+		walk_ptedge : G.ident M0.pt_edge -> edge;
+		walk_pedge  : G.ident M0.p_edge  -> edge;
+		walk_tnode  : G.ident M0.t_node  -> G.ident M0.next';
+		walk_peval  : M0.eval -> G.pnode -> edge;
+		memo_peval  : (M0.eval * G.pnode, edge) MemoTable.t;
+	}
 
-	let newman = G.newman
-	let makeman = G.makeman
+
+	let makeman size =
+		let gman = G.makeman size in
+		let memo_peval, apply_peval = MemoTable.make size in
+		let rec push tag edge0 edge1 : G.ident M0.edge' =
+			walk_ptedge (M.push G.get_ident tag edge0 edge1)
+		and     walk_ptedge (edge, ptnode) : G.ident M0.edge' = match ptnode with
+			| Utils.PTree node -> walk_pedge (edge, node)
+			| Utils.TTree node -> (edge, walk_tnode node)
+		and     walk_pedge (edge, pnode) : G.ident M0.edge' = match pnode with
+			| Utils.TNode (tag, (pedge0, pedge1)) ->
+			(
+				let edge0 = walk_pedge pedge0
+				and edge1 = walk_pedge pedge1 in
+				M0.compose edge (push tag edge0 edge1)
+			)
+			| Utils.TLeaf leaf ->
+			(
+				(edge, Utils.Leaf leaf)
+			)
+			| Utils.TLink (peval, node) ->
+			( match peval with
+				| None -> (edge, Utils.Node node)
+				| Some peval -> M0.compose edge (walk_peval peval node)
+			)
+		and     walk_peval peval node = apply_peval
+			(fun (peval, node) -> walk_ptedge (M0.eval_node peval (G.pull gman node))) (peval, node)
+		and     walk_tnode : G.ident M0.t_node -> G.ident M0.next' = function
+			| Utils.TNode (node, (((), tnode0), ((), tnode1))) ->
+			(
+				let next0 = walk_tnode tnode0
+				and next1 = walk_tnode tnode1 in
+				let node = G.push gman (node, next0, next1) in
+				Utils.Node node
+			)
+			| Utils.TLeaf leaf -> Utils.Leaf leaf
+			| Utils.TLink node -> Utils.Node node	
+		in
+		{gman; push; walk_ptedge; walk_pedge; walk_tnode; walk_peval; memo_peval}
+  
+	let default_newman_hsize = 10000
+		
+	let newman () = makeman default_newman_hsize
+
+	let push man = man.push
 
 	let push_leaf (e:M.edge) (l:M.leaf) = ((e, ((Utils.Leaf l):G.tree)):edge)
-	let pull_node man (n:G.pnode) = M.pull_node G.get_ident (G.pull man n)
-
-	let push man tag x y = match M.push G.get_ident tag x y with
-		| Utils.MEdge e -> e
-		| Utils.MNode (e, (n:G.node)) -> (e, Utils.Node (G.push man n))
-
-	let pull man ((_, n)as e) = match M.pull G.get_ident e with
-		| Utils.MEdge (t, x, y) -> (t, x, y)
-		| Utils.MNode f -> match n with
-			| Utils.Leaf _ -> assert false
-			| Utils.Node p -> f(G.pull man p)
+	let pull man (n:G.pnode) = M.pull G.get_ident (G.pull man.gman n)
 
 	let compose = M.compose
 
-	let dump_stats = G.dump_stats
+	let dump_stats man = Tree.Node [
+		G.dump_stats man.gman;
+		Tree.Node [Tree.Leaf "#eval: "; MemoTable.dump_stats man.memo_peval]
+	]
 	
 
 	module type MODELE_NODE_VISITOR =
@@ -132,7 +195,7 @@ struct
 			and		calcedge edge = applyEdge (fun (edge, gnode) -> D0.do_edge extra edge (calcrec gnode)) edge
 			and		calcleaf leaf = applyLeaf (D0.do_leaf extra) leaf
 			and		calcnode node = applyNode (fun node ->
-				let (node:M.node), (nx:G.tree), (ny:G.tree) = G.pull man node in
+				let (node:M.node), (nx:G.tree), (ny:G.tree) = G.pull man.gman node in
 				match D0.do_node extra node with
 				| Utils.MEdge xnode -> xnode
 				| Utils.MNode merger -> merger (calcrec nx) (calcrec ny)) node
@@ -188,7 +251,7 @@ struct
 				| Utils.MEdge xedge -> xedge
 				| Utils.MNode merger ->
 				(
-					let tag, edge0, edge1 = pull_node man node in
+					let tag, edge0, edge1 = pull man node in
 					merger tag (calcrec edge0) (calcrec edge1)
 				)
 			in
@@ -350,7 +413,7 @@ struct
 				| Utils.MEdge edge -> edge
 				| Utils.MNode (medge, (mess, node)) -> compose medge (apply calc (mess, node))
 			and		calc (mess, node) =
-				let tag, edgeX, edgeY = pull_node man node in
+				let tag, edgeX, edgeY = pull man node in
 				match D0.read mess tag with
 				| Utils.MStop edge -> edge
 				| Utils.Go0 eval -> calcrec eval edgeX
@@ -412,7 +475,7 @@ struct
 				| Utils.MEdge edge -> edge
 				| Utils.MNode (medge, (mess, node)) -> compose medge (apply_eval eval_node (mess, node))
 			and		eval_node (mess, node) =
-				let tag, edgeX, edgeY = pull_node man node in
+				let tag, edgeX, edgeY = pull man node in
 				match D0.read mess tag with
 				| Utils.MStop edge -> edge
 				| Utils.Go0 eval -> eval_edge eval edgeX
@@ -427,7 +490,7 @@ struct
 				| Utils.MNode (edge, (tag, eogX, eogY)) -> compose edge (solve_node (tag, eval_eog eogX, eval_eog eogY))) node
 			in
 			let rec solve_pnode (pnode:G.pnode) =
-				let tag, edgeX, edgeY = pull_node man pnode in
+				let tag, edgeX, edgeY = pull man pnode in
 				solve_node (tag, solve_edge edgeX, solve_edge edgeY)
 			and		solve_edge (edge, gtree) : edge = match gtree with
 				| Utils.Leaf leaf -> (((edge:M.edge), Utils.Leaf leaf):edge)

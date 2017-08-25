@@ -1,5 +1,27 @@
 open Extra
 
+let merge_uniq lX lY : _ list =
+(* merges two already sorted list and returns a sorted list *)
+(* removes duplicates *)
+(* Time Complexity O(nX + nY) *)
+	let rec aux carry = function
+	| ([], l) | (l, []) -> (List.rev carry)@l
+	| (x::x', y::y') -> if x = y
+		then aux (x::carry) (x', y')
+		else if x < y
+		then aux (x::carry) (x', y::y')
+		else aux (y::carry) (x::x', y')
+	in
+	aux [] (lX, lY)
+
+let partition part liste =
+	let rec aux l0 l1 = function
+		| [] -> (List.rev l0, List.rev l1)
+		| head::tail -> match part head with
+			| Ok obj -> aux l0 (obj::l1) tail
+			| Error obj -> aux (obj::l0) l1 tail
+	in aux [] [] liste
+
 let list_init n f =
 	assert(n>=0);
 	let rec aux carry = function
@@ -51,7 +73,11 @@ let count f l = sum(l||>(fun x -> if f x then 1 else 0))
 let counti f l = sum(List.mapi (fun i x -> if (f i x) then 1 else 0)l)
 
 let count_true = count (fun x -> x)
-let counti_true = counti (fun _ x -> x)
+
+let indexes f l = unop(List.mapi (fun i x -> if f x then Some i else None) l)
+let indexes_true l = indexes (fun x -> x) l
+
+
 
 let ntimes x =
 	let rec aux carry = function
@@ -66,7 +92,6 @@ let ncopy x =
 		| 0 -> carry
 		| n -> aux (x@carry) (n-1)
 	in aux []
-
 
 let listfilter filt flist =
 	let rec aux filt flist plist = match filt, flist with
@@ -136,6 +161,12 @@ let list_index item =
 			then Some pos
 			else (aux (pos+1) tail)
 	in aux 0
+
+let indexesi f l =
+	let rec aux carry i = function
+		| [] -> List.rev carry
+		| x::x' -> aux (if f i x then (i::carry) else carry) (i+1) x'
+	in aux [] 0 l
 
 let index p =
 	let rec aux pos = function

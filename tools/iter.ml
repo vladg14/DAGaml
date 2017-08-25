@@ -11,8 +11,6 @@ let gen_bool =
 	function() -> Elem(false,
 	function() -> Stop))	
 
-let ( $. ) i = i()
-
 let range x y =
 	let rec aux x () =
 		if x < y
@@ -43,6 +41,26 @@ let fold_left0 sx x0 i =
 		| Stop			-> s
 		| Elem(x, i')	-> aux (sx s x) i'
 	in aux x0 i
+
+let find sx i =
+	let rec aux i = match i() with
+		| Stop         -> None
+		| Elem(x, i') -> match sx x with
+			| Some y   -> Some y
+			| None     -> aux i
+	in aux i
+
+let exists sx i =
+	let rec aux i = match i() with
+		| Stop -> false
+		| Elem(x, i') -> (sx x)||(aux i)
+	in aux i
+
+let for_all sx i =
+	let rec aux i = match i() with
+		| Stop -> true
+		| Elem(x, i') -> (sx x)&&(aux i)
+	in aux i
 
 let ( $! ) i sx x0 = fold_left0 sx x0 i
 
@@ -129,11 +147,11 @@ let enumerate n i =
 	in
 	aux n i
 
-let progress step n i =
+let progress head step init iter =
 	let rec aux n i () = match i() with
-		| Stop -> (print_int n; print_newline(); Stop)
-		| Elem(x, i') -> ((if n mod step = 0 then (print_int n; print_string "\r"; flush stdout)); Elem(x, aux (n+1) i'))
-	in aux n i
+		| Stop -> (print_string head; print_int n; print_newline(); Stop)
+		| Elem(x, i') -> ((if n mod step = 0 then (print_string head; print_int n; print_string "\r"; flush stdout)); Elem(x, aux (n+1) i'))
+	in aux init iter
 
 let iter_while f x0 =
 	let rec aux x () = match f x with
@@ -159,6 +177,8 @@ let unop' opi next =
 	in aux opi
 
 let unop opi = unop' opi stop
+
+let ( $? ) i f = unop (i $$ f)
 
 let filter' f i next = unop' (i $$ (fun x -> if f x then Some x else None)) next
 
@@ -307,4 +327,3 @@ let half_square_strict i =
 		| 0 -> push [] stop
 		| 1 -> inlist i
 		| k -> assert(k > 1); aux k i
-
