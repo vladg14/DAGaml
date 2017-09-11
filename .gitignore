@@ -1,3 +1,6 @@
+# DAGaml working directory
+_workdir/
+
 *.annot
 *.cmo
 *.cma
@@ -18,3 +21,16 @@ _build/
 # oasis generated files
 setup.data
 setup.log
+
+# latex working files
+*.bbl
+*.blg
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.tex~
+*.toc
+
