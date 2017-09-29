@@ -316,3 +316,4 @@ struct
 			| objet::_ -> stree_load objet
 end
 
+(* TODO : module EXPORT with left-right propagation *)
