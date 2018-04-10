@@ -1,0 +1,3 @@
+[submodule "DAGaml-docs"]
+	path = DAGaml-docs
+	url = https://gitlab.com/JoanThibault/DAGaml-docs.git
