@@ -1,0 +1,32 @@
+
+  FORCE 0.1 
+  A new static global variable ordering for SAT & BDDs
+  Much faster than MINCE. 
+
+  by Fadi Aloul <faloul@eecs.umich.edu>
+  (C) 2003 Univ. of Michigan     
+
+  File Description
+  ---------------- 
+   cnf2hgraph.pl        : Reads file.cnf and creates a hypergraph
+                          the output files created are 
+                          out.aux, out.nets, out.nodes
+			   
+   NetPlacer            : Identifies the new CNF variable ordering
+                          and outputs the new order to out.pl
+			  (Run NetPlacer -h for further options)
+
+   cnf_rename_vars.pl   : Renames the variables in the CNF file 
+ 		          according to the new variable order.
+
+
+  Sample Run 
+  ----------
+   % cnf2hgraph.pl sample.cnf
+   % NetPlacer -c 6
+   % cnf_rename_vars.pl out.pl sample.cnf sample_new.cnf
+
+   (replace "sample.cnf" by original CNF file name, and 
+    "sample_new.cnf" by the new reordered CNF file name)
+
+  

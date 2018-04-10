@@ -18,3 +18,7 @@ If you want to help me design this tool but you have no idea how : contact me.
 
 # Installation
 you should have installed ocaml (4.04 at least), then clone this repository : git clone https://github.com/JoanThibault/DAGaml.git
+
+
+
+PS: Please follow the Ariadne's thread ;-)

@@ -4,22 +4,42 @@ extra=$dagaml/extra
 bin=$dagaml/bin
 select="python $extra/select-lines.py"
 conv="$bin/test_conv_ext.native"
+echo "" >> logs.fof
 for src in $@
 do
 	dst=$(python $extra/extract_name.py $src)
 	echo "$dst"
-	echo " -         cnf to   cp.A.tacx"
-	(time $bin/test_conv.native $src .cnf $dst.cp.A.tacx .cp.A.tacx) &> $dst.cnf-to-cpA.log
-	echo " -   cp.A.tacx to  cpx.B.pure"
-	(time $conv $dst .cp.A.tacx $dst .cpx.B.pure) &> $dst.cpA-to-cpxB.log
-	echo " -   cp.A.tacx to   cp.B.pure"
-	(time $conv $dst .cp.A.tacx $dst .cp.B.pure ) &> $dst.cpA-to-cpB.log
-	echo " - export cpx.B.pure to .cntsat"
-	(time $conv $dst .cpx.B.pure $dst.cpx.B.pure .cntsat) &> $dst.cntsat-cpxB.log
-	echo " - export cp.B.pure  to .cntsat"
-	(time $conv $dst .cp.B.pure  $dst.cp.B.pure  .cntsat) &> $dst.cntsat-cpB.log
+	echo " -         cnf to   cp.A.tacx (v3)"
+	(time $bin/test_upgrade_benchmark_cnf_to_tacx_cp_v3.native $src $dst.3.cp.A.tacx) &> $dst.3.cnf-to-cpA.log
+	echo " -         cnf to   cp.A.tacx (v4)"
+	(time $bin/test_upgrade_benchmark_cnf_to_tacx_cp_v4.native $src $dst.4.cp.A.tacx) &> $dst.4.cnf-to-cpA.log
+	echo " -   cp.A.tacx to  cpx.B.pure (v3)"
+	(time $conv $dst.3 .cp.A.tacx $dst.3 .cpx.B.pure) &> $dst.3.cpA-to-cpxB.log &
+	echo " -   cp.A.tacx to  cpx.B.pure (v4)"
+	(time $conv $dst.4 .cp.A.tacx $dst.4 .cpx.B.pure) &> $dst.4.cpA-to-cpxB.log &
+	echo " - export cpx.B.pure to .cntsat (v3)"
+	wait
+	(time $conv $dst.3 .cpx.B.pure $dst.3 .cntsat) &> $dst.cntsat-v3.log
+	echo " - export cpx.B.pure to .cntsat (v4)"
+	(time $conv $dst.4 .cpx.B.pure $dst.4 .cntsat) &> $dst.cntsat-v4.log
+	echo " - export cp.A.tacx to .stats (v3)"
+	(time $conv $dst.3 .cp.A.tacx $dst.3.tacx .stats) &> $dst.tacx-stats-v3.log
+	echo " - export cp.A.tacx to .stats (v4)"
+	(time $conv $dst.4 .cp.A.tacx $dst.4.tacx .stats) &> $dst.tacx-stats-v4.log
+	echo " - export cpx.B.pure to .stats (v3)"
+	(time $conv $dst.3 .cpx.B.pure $dst.3.pure .stats) &> $dst.pure-stats-v3.log
+	echo " - export cpx.B.pure to .stats (v4)"
+	(time $conv $dst.4 .cpx.B.pure $dst.4.pure .stats) &> $dst.pure-stats-v4.log
 	log=$dst.stats.log
 	echo $dst > $log
-	cat $dst.cp.B.pure.cntsat >> $log
-	cat $dst.cpx.B.pure.cntsat >> $log
+	echo $log >> logs.fof
+	cat $dst.3.cntsat >> $log
+	cat $dst.4.cntsat >> $log
+	python $extra/pick.py --strip " \t" : """$(grep m $dst.3.cpA-to-cpxB.log | grep s)""" >> $log
+	python $extra/pick.py --strip " \t" : """$(grep m $dst.4.cpA-to-cpxB.log | grep s)""" >> $log
+	python $extra/pick.py --strip "():# \"" 4 """$(cat $dst.3.tacx.stats)""" >> $log
+	python $extra/pick.py --strip "():# \"" 4 """$(cat $dst.4.tacx.stats)""" >> $log
+	#python $extra/pick.py --strip "():# \"" : """$(cat $dst.3.pure.stats)""" >> $log
+	#python $extra/pick.py --strip "():# \"" : """$(cat $dst.4.pure.stats)""" >> $log
 done
+python extra/select-lines.py "list(range(1, 12))" $(cat logs.fof)

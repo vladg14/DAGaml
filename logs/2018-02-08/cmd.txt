@@ -1,0 +1,3 @@
+get DAGaml/result.csv input-result-cnf.csv
+get DAGaml-1/result.csv input-result-v-10m.csv
+get DAGaml-2/result.csv input-result-v-30m.csv

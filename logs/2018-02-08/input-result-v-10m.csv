@@ -1,0 +1,430 @@
+
+
+[2, 3, 4, 5]
+32,	30,	39,	39
+workdir/small-v/addsub4_1pref-1.out
+workdir/small-v/addsub4_1pref-2.out
+workdir/small-v/addsub4_1pref-3.out
+workdir/small-v/addsub4_1pref-4.out
+workdir/small-v/addsub4_1pref.out
+7,	7,	8,	9
+workdir/small-v/addsub4_2rca-1.out
+workdir/small-v/addsub4_2rca-2.out
+workdir/small-v/addsub4_2rca-3.out
+workdir/small-v/addsub4_2rca-4.out
+workdir/small-v/and-0.out
+workdir/small-v/b1_orig-0.out
+7,	7,	8,	7
+17,	17,	17,	17
+workdir/small-v/b1_orig-3.out
+workdir/small-v/b1_sweep-0.out
+7,	7,	8,	7
+17,	17,	17,	17
+workdir/small-v/b1_sweep-3.out
+workdir/small-v/b1_synth-0.out
+10,	9,	10,	10
+22,	21,	20,	19
+workdir/small-v/b1_synth-3.out
+workdir/small-v/cc_synth-0.out
+workdir/small-v/cc_synth-1.out
+workdir/small-v/cc_synth-10.out
+workdir/small-v/cc_synth-11.out
+workdir/small-v/cc_synth-12.out
+workdir/small-v/cc_synth-13.out
+workdir/small-v/cc_synth-14.out
+workdir/small-v/cc_synth-15.out
+workdir/small-v/cc_synth-16.out
+workdir/small-v/cc_synth-17.out
+workdir/small-v/cc_synth-18.out
+workdir/small-v/cc_synth-19.out
+workdir/small-v/cc_synth-2.out
+workdir/small-v/cc_synth-3.out
+workdir/small-v/cc_synth-4.out
+workdir/small-v/cc_synth-5.out
+workdir/small-v/cc_synth-6.out
+workdir/small-v/cc_synth-7.out
+workdir/small-v/cc_synth-8.out
+workdir/small-v/cc_synth-9.out
+45,	27,	53,	42
+45,	27,	51,	42
+45,	27,	53,	43
+45,	27,	51,	43
+45,	27,	53,	43
+45,	27,	51,	43
+45,	27,	53,	42
+45,	27,	51,	42
+45,	27,	53,	42
+45,	27,	51,	42
+45,	27,	53,	43
+45,	27,	51,	43
+45,	27,	53,	43
+45,	27,	51,	43
+45,	27,	53,	42
+45,	27,	51,	42
+46,	40,	38,	41
+45,	28,	52,	45
+46,	40,	38,	42
+46,	40,	35,	42
+46,	40,	37,	41
+46,	40,	34,	41
+46,	40,	37,	42
+46,	40,	34,	42
+workdir/small-v/cm150a_orig-0.out
+workdir/small-v/cm150a_sweep-0.out
+workdir/small-v/cm150a_synth-0.out
+workdir/small-v/cm151a_orig-0.out
+workdir/small-v/cm151a_orig-1.out
+workdir/small-v/cm151a_sweep-0.out
+workdir/small-v/cm151a_sweep-1.out
+workdir/small-v/cm151a_synth-0.out
+workdir/small-v/cm151a_synth-1.out
+workdir/small-v/cm152a_orig-0.out
+workdir/small-v/cm152a_sweep-0.out
+workdir/small-v/cm152a_synth-0.out
+workdir/small-v/cm162a_orig-0.out
+workdir/small-v/cm162a_orig-1.out
+workdir/small-v/cm162a_orig-2.out
+workdir/small-v/cm162a_orig-3.out
+6,	6,	6,	6
+workdir/small-v/cm162a_sweep-0.out
+workdir/small-v/cm162a_sweep-1.out
+workdir/small-v/cm162a_sweep-2.out
+workdir/small-v/cm162a_sweep-3.out
+6,	6,	6,	6
+workdir/small-v/cm162a_synth-0.out
+workdir/small-v/cm162a_synth-1.out
+workdir/small-v/cm162a_synth-2.out
+workdir/small-v/cm162a_synth-3.out
+6,	6,	6,	6
+workdir/small-v/cm163a_orig-0.out
+workdir/small-v/cm163a_orig-1.out
+workdir/small-v/cm163a_orig-2.out
+workdir/small-v/cm163a_orig-3.out
+workdir/small-v/cm163a_orig-4.out
+workdir/small-v/cm163a_sweep-0.out
+workdir/small-v/cm163a_sweep-1.out
+workdir/small-v/cm163a_sweep-2.out
+workdir/small-v/cm163a_sweep-3.out
+workdir/small-v/cm163a_sweep-4.out
+workdir/small-v/cm163a_synth-0.out
+workdir/small-v/cm163a_synth-1.out
+workdir/small-v/cm163a_synth-2.out
+workdir/small-v/cm163a_synth-3.out
+workdir/small-v/cm163a_synth-4.out
+15,	13,	19,	21
+15,	13,	18,	21
+15,	13,	19,	19
+15,	13,	18,	19
+24,	18,	20,	23
+24,	18,	20,	23
+24,	18,	20,	23
+24,	18,	20,	23
+16,	13,	21,	13
+16,	13,	21,	13
+15,	13,	19,	21
+15,	13,	18,	21
+15,	13,	19,	19
+15,	13,	18,	19
+24,	18,	20,	23
+24,	18,	20,	23
+24,	18,	20,	23
+24,	18,	20,	23
+16,	13,	21,	13
+16,	13,	21,	13
+16,	14,	23,	16
+16,	14,	20,	16
+16,	14,	16,	15
+16,	14,	16,	15
+16,	14,	16,	15
+16,	14,	16,	15
+16,	14,	16,	14
+16,	14,	16,	15
+16,	14,	23,	16
+16,	14,	20,	16
+23,	19,	30,	30
+77,	67,	118,	119
+70,	47,	81,	78
+23,	19,	30,	30
+77,	67,	118,	119
+70,	47,	81,	78
+23,	19,	30,	30
+87,	51,	100,	95
+114,	65,	71,	69
+workdir/small-v/cm85a_orig-0.out
+workdir/small-v/cm85a_orig-1.out
+workdir/small-v/cm85a_orig-2.out
+workdir/small-v/cm85a_sweep-0.out
+workdir/small-v/cm85a_sweep-1.out
+workdir/small-v/cm85a_sweep-2.out
+workdir/small-v/cm85a_synth-0.out
+workdir/small-v/cm85a_synth-1.out
+workdir/small-v/cm85a_synth-2.out
+workdir/small-v/cmb_orig-0.out
+workdir/small-v/cmb_orig-1.out
+workdir/small-v/cmb_orig-2.out
+workdir/small-v/cmb_orig-3.out
+workdir/small-v/cmb_sweep-0.out
+workdir/small-v/cmb_sweep-1.out
+workdir/small-v/cmb_sweep-2.out
+workdir/small-v/cmb_sweep-3.out
+workdir/small-v/cmb_synth-0.out
+workdir/small-v/cmb_synth-1.out
+workdir/small-v/cmb_synth-2.out
+workdir/small-v/cmb_synth-3.out
+workdir/small-v/cordic_synth-0.out
+workdir/small-v/cordic_synth-1.out
+workdir/small-v/ct_6_2-0.out
+workdir/small-v/ct_6_2-1.out
+workdir/small-v/ct_6_2-2.out
+workdir/small-v/ct_6_2-3.out
+workdir/small-v/ct_6_2-4.out
+workdir/small-v/ct_6_2-5.out
+workdir/small-v/cu_orig-0.out
+workdir/small-v/cu_orig-1.out
+workdir/small-v/cu_orig-10.out
+workdir/small-v/cu_orig-2.out
+workdir/small-v/cu_orig-3.out
+workdir/small-v/cu_orig-4.out
+workdir/small-v/cu_orig-5.out
+workdir/small-v/cu_orig-6.out
+10,	10,	10,	10
+workdir/small-v/cu_orig-8.out
+4,	4,	4,	4
+workdir/small-v/cu_sweep-0.out
+workdir/small-v/cu_sweep-1.out
+workdir/small-v/cu_sweep-10.out
+workdir/small-v/cu_sweep-2.out
+workdir/small-v/cu_sweep-3.out
+workdir/small-v/cu_sweep-4.out
+workdir/small-v/cu_sweep-5.out
+workdir/small-v/cu_sweep-6.out
+10,	10,	10,	10
+workdir/small-v/cu_sweep-8.out
+4,	4,	4,	4
+workdir/small-v/cu_synth-0.out
+workdir/small-v/cu_synth-1.out
+workdir/small-v/cu_synth-10.out
+workdir/small-v/cu_synth-2.out
+workdir/small-v/cu_synth-3.out
+workdir/small-v/cu_synth-4.out
+workdir/small-v/cu_synth-5.out
+workdir/small-v/cu_synth-6.out
+workdir/small-v/cu_synth-7.out
+workdir/small-v/cu_synth-8.out
+4,	4,	4,	4
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+10,	10,	10,	10
+workdir/small-v/gpc_0_6__3-0.out
+workdir/small-v/gpc_0_6__3-1.out
+workdir/small-v/gpc_0_6__3-2.out
+workdir/small-v/gpc_1_5__3-0.out
+workdir/small-v/gpc_1_5__3-1.out
+workdir/small-v/gpc_1_5__3-2.out
+30,	27,	35,	35
+80,	48,	109,	109
+52,	33,	60,	57
+workdir/small-v/i1_orig-0.out
+workdir/small-v/i1_orig-1.out
+workdir/small-v/i1_orig-10.out
+workdir/small-v/i1_orig-11.out
+workdir/small-v/i1_orig-12.out
+workdir/small-v/i1_orig-13.out
+workdir/small-v/i1_orig-14.out
+workdir/small-v/i1_orig-15.out
+workdir/small-v/i1_orig-2.out
+workdir/small-v/i1_orig-3.out
+workdir/small-v/i1_orig-4.out
+workdir/small-v/i1_orig-5.out
+workdir/small-v/i1_orig-6.out
+workdir/small-v/i1_orig-7.out
+workdir/small-v/i1_orig-8.out
+workdir/small-v/i1_orig-9.out
+workdir/small-v/i1_sweep-0.out
+workdir/small-v/i1_sweep-1.out
+workdir/small-v/i1_sweep-10.out
+workdir/small-v/i1_sweep-11.out
+workdir/small-v/i1_sweep-12.out
+workdir/small-v/i1_sweep-13.out
+workdir/small-v/i1_sweep-14.out
+workdir/small-v/i1_sweep-15.out
+workdir/small-v/i1_sweep-2.out
+workdir/small-v/i1_sweep-3.out
+workdir/small-v/i1_sweep-4.out
+workdir/small-v/i1_sweep-5.out
+workdir/small-v/i1_sweep-6.out
+workdir/small-v/i1_sweep-7.out
+workdir/small-v/i1_sweep-8.out
+workdir/small-v/i1_sweep-9.out
+workdir/small-v/i1_synth-0.out
+workdir/small-v/i1_synth-1.out
+workdir/small-v/i1_synth-10.out
+workdir/small-v/i1_synth-11.out
+workdir/small-v/i1_synth-12.out
+workdir/small-v/i1_synth-13.out
+workdir/small-v/i1_synth-14.out
+workdir/small-v/i1_synth-15.out
+workdir/small-v/i1_synth-2.out
+workdir/small-v/i1_synth-3.out
+workdir/small-v/i1_synth-4.out
+workdir/small-v/i1_synth-5.out
+workdir/small-v/i1_synth-6.out
+workdir/small-v/i1_synth-7.out
+workdir/small-v/i1_synth-8.out
+workdir/small-v/i1_synth-9.out
+workdir/small-v/lzd_16-0.out
+workdir/small-v/lzd_16-1.out
+workdir/small-v/lzd_16-2.out
+workdir/small-v/lzd_16-3.out
+workdir/small-v/lzd_8-0.out
+50,	30,	58,	60
+37,	20,	29,	26
+workdir/small-v/maj9-0.out
+workdir/small-v/majority_orig-0.out
+workdir/small-v/majority_sweep-0.out
+101,	63,	89,	86
+4,	4,	4,	4
+16,	15,	21,	22
+workdir/small-v/mul3-2.out
+workdir/small-v/mul3-3.out
+workdir/small-v/mul3-4.out
+workdir/small-v/mul3-5.out
+workdir/small-v/mux_synth-0.out
+workdir/small-v/or-0.out
+workdir/small-v/parity_orig-0.out
+workdir/small-v/parity_sweep-0.out
+workdir/small-v/parity_synth-0.out
+workdir/small-v/pcle_orig-0.out
+workdir/small-v/pcle_orig-1.out
+workdir/small-v/pcle_orig-2.out
+workdir/small-v/pcle_orig-3.out
+workdir/small-v/pcle_orig-4.out
+workdir/small-v/pcle_orig-5.out
+workdir/small-v/pcle_orig-6.out
+workdir/small-v/pcle_orig-7.out
+workdir/small-v/pcle_orig-8.out
+workdir/small-v/pcle_sweep-0.out
+workdir/small-v/pcle_sweep-1.out
+workdir/small-v/pcle_sweep-2.out
+workdir/small-v/pcle_sweep-3.out
+workdir/small-v/pcle_sweep-4.out
+workdir/small-v/pcle_sweep-5.out
+workdir/small-v/pcle_sweep-6.out
+workdir/small-v/pcle_sweep-7.out
+workdir/small-v/pcle_sweep-8.out
+workdir/small-v/pcle_synth-0.out
+workdir/small-v/pcle_synth-1.out
+workdir/small-v/pcle_synth-2.out
+workdir/small-v/pcle_synth-3.out
+workdir/small-v/pcle_synth-4.out
+workdir/small-v/pcle_synth-5.out
+workdir/small-v/pcle_synth-6.out
+workdir/small-v/pcle_synth-7.out
+workdir/small-v/pcle_synth-8.out
+workdir/small-v/pcler8_orig-0.out
+workdir/small-v/pcler8_orig-1.out
+workdir/small-v/pcler8_orig-10.out
+workdir/small-v/pcler8_orig-11.out
+workdir/small-v/pcler8_orig-12.out
+workdir/small-v/pcler8_orig-13.out
+workdir/small-v/pcler8_orig-14.out
+workdir/small-v/pcler8_orig-15.out
+workdir/small-v/pcler8_orig-16.out
+workdir/small-v/pcler8_orig-2.out
+workdir/small-v/pcler8_orig-3.out
+workdir/small-v/pcler8_orig-4.out
+workdir/small-v/pcler8_orig-5.out
+workdir/small-v/pcler8_orig-6.out
+workdir/small-v/pcler8_orig-7.out
+workdir/small-v/pcler8_orig-8.out
+workdir/small-v/pcler8_orig-9.out
+workdir/small-v/pcler8_sweep-0.out
+workdir/small-v/pcler8_sweep-1.out
+workdir/small-v/pcler8_sweep-10.out
+workdir/small-v/pcler8_sweep-11.out
+workdir/small-v/pcler8_sweep-12.out
+workdir/small-v/pcler8_sweep-13.out
+workdir/small-v/pcler8_sweep-14.out
+workdir/small-v/pcler8_sweep-15.out
+workdir/small-v/pcler8_sweep-16.out
+workdir/small-v/pcler8_sweep-2.out
+workdir/small-v/pcler8_sweep-3.out
+workdir/small-v/pcler8_sweep-4.out
+workdir/small-v/pcler8_sweep-5.out
+workdir/small-v/pcler8_sweep-6.out
+workdir/small-v/pcler8_sweep-7.out
+workdir/small-v/pcler8_sweep-8.out
+workdir/small-v/pcler8_sweep-9.out
+workdir/small-v/pcler8_synth-0.out
+workdir/small-v/pcler8_synth-1.out
+workdir/small-v/pcler8_synth-10.out
+workdir/small-v/pcler8_synth-11.out
+workdir/small-v/pcler8_synth-12.out
+workdir/small-v/pcler8_synth-13.out
+workdir/small-v/pcler8_synth-14.out
+workdir/small-v/pcler8_synth-15.out
+workdir/small-v/pcler8_synth-16.out
+workdir/small-v/pcler8_synth-2.out
+workdir/small-v/pcler8_synth-3.out
+workdir/small-v/pcler8_synth-4.out
+workdir/small-v/pcler8_synth-5.out
+workdir/small-v/pcler8_synth-6.out
+workdir/small-v/pcler8_synth-7.out
+workdir/small-v/pcler8_synth-8.out
+workdir/small-v/pcler8_synth-9.out
+10,	9,	8,	7
+4,	4,	4,	4
+workdir/small-v/pm1_orig-10.out
+workdir/small-v/pm1_orig-11.out
+workdir/small-v/pm1_orig-12.out
+workdir/small-v/pm1_orig-2.out
+workdir/small-v/pm1_orig-3.out
+workdir/small-v/pm1_orig-4.out
+workdir/small-v/pm1_orig-5.out
+
+

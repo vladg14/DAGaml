@@ -1,5 +1,5 @@
 # DAGaml working directory
-_workdir/
+workdir/
 
 *.annot
 *.cmo

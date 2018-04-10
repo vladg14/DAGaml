@@ -506,37 +506,19 @@ module S(I : sig val least_first : bool end) = struct
 (*
 Joan.Thibault@ens-rennes.fr
 	-> pos
-*)
-	let pos = if I.least_first then (fun n -> fun i -> i) else (fun n -> fun i -> n-1-i)
-
-  let to_string v =
-    let n = v.length in
-    let s = String.make n '0' in
-	let p = pos n in
-    for i = 0 to n - 1 do
-      if unsafe_get v i then Bytes.set s (p i) '1'
-    done;
-    s
-
-  let print fmt v = Format.pp_print_string fmt (to_string v)
-
-  let of_string s =
-    let n = String.length s in
-    let v = create n false in
-	let p = pos n in
-    for i = 0 to n - 1 do
-	  match String.unsafe_get s i with
-	  | '1' -> unsafe_set v (p i) true
-	  | '0' -> ()
-	  |  _  -> invalid_arg "Bitv.of_string"
-    done;
-    v
-
-(*
-Joan.Thibault@ens-rennes.fr
 	-> to_bool_array
 	-> of_bool_array
+	-> to_string
+	-> of_string
+	-> to_bool_list
+	-> of_bool_list
+	-> to_bool_string
+	-> of_bool_string
+	-> to_hexa_string
+	-> of_hexa_string
 *)
+
+	let pos = if I.least_first then (fun n -> fun i -> i) else (fun n -> fun i -> n-1-i)
 
 	let to_bool_array v =
 		let n = v.length in
@@ -555,12 +537,26 @@ Joan.Thibault@ens-rennes.fr
 			if (Array.unsafe_get s (p i)) then unsafe_set v (p i) true
 		done;
 		v
-	
-	let to_bool_list = Extra.(to_bool_array >> Array.to_list)
-	let of_bool_list = Extra.(Array.of_list >> of_bool_array)
 
-	let to_bool_string = Extra.(to_bool_list ||>> StrUtil.char_of_bool >> StrUtil.implode)
-	let of_bool_string = Extra.(StrUtil.explode ||>> StrUtil.bool_of_char >> of_bool_list)
+  let to_string v = v
+		|> to_bool_array
+		|> StrUtil.string_of_bool_array
+
+  let of_string s = s
+		|> StrUtil.bool_array_of_string
+		|> of_bool_array
+
+  let print fmt v = Format.pp_print_string fmt (to_string v)
+	
+	let to_bool_list v = v
+		|> to_bool_array
+		|> Array.to_list
+	let of_bool_list l = l
+		|> Array.of_list
+		|> of_bool_array
+
+	let to_bool_string = to_string
+	let of_bool_string = of_string
 	
 	let to_hexa_string =
 		let tochar x =
@@ -612,7 +608,7 @@ Joan.Thibault@ens-rennes.fr
 			then aux 1 [] (x-28)
 			else (assert false)
 		in
-		(fun s -> of_bool_array (Array.of_list (List.flatten (List.map (fun c -> ofint(ofchar c))   (StrUtil.explode s)))))
+		(fun s -> of_bool_array (Array.of_list (MyList.catmap (fun c -> ofint(ofchar c)) (StrUtil.explode s))))
 
 end
 module L = S(struct let least_first = true end)

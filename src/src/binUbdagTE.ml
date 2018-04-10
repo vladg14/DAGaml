@@ -152,6 +152,91 @@ struct
 		(import man, edges)
 
 	let eval man = man.eval
+end
+
+module MODULE_CACHED(M0:MODELE) =
+struct
+	module M = M0
+	module G = BinUbdag.MODULE(M0.M)
+
+	type link = M.peval option * G.ident
+	type next'' = G.ident M.next''
+	type edge'' = G.ident M.edge''
+	type node'' = G.ident M.node''
+	type tree'' = G.ident M.tree''
+
+	let o3s_next'' = M.o3s_next'' G.o3s_ident
+	let o3s_edge'' = M.o3s_edge'' G.o3s_ident
+	let o3s_node'' = M.o3s_node'' G.o3s_ident
+	let o3s_tree'' = M.o3s_tree'' G.o3s_ident
+
+    type manager = {
+		man : G.manager;
+		mem : (M.peval * G.ident, Bitv.t, G.edge', Bitv.t) Hashcache.tt;
+		eval : M.peval -> G.edge' -> G.edge';
+		push : G.node' -> G.edge';
+	}
+
+	let export man = man.man
+
+	let import' hsize man =
+		let o3sA = BinO3.closure (M.o3s_peval +* G.o3s_ident) in
+		let mem, apply = Hashcache.tt_make o3sA G.o3b_edge' hsize in
+		let rec push node : G.edge' = read_edge (M.push_node (Utils.pnode_of_node node))
+		and     eval peval (edge : G.edge') : G.edge' =
+			goup_edge' (M.eval_edge peval (Utils.pedge_of_edge edge))
+		and     goup_edge ((edge, next) : edge'') : bool * G.edge' = match next with
+			| Utils.Leaf leaf -> (false, (edge, Utils.Leaf leaf))
+			| Utils.Node (opeval, ident) -> match opeval with
+				| None -> (false, (edge, Utils.Node ident))
+				| Some peval -> (true, M.compose edge (eval_ident peval ident))
+		and     goup_edge' edge : G.edge' = goup_edge edge |> snd
+		and     eval_ident peval ident = apply (fun (peval, ident) ->
+			let node = G.pull man ident |> Utils.pnode_of_node in
+			match M.eval_node peval node with
+			| Utils.MEdge edge -> goup_edge' edge
+			| Utils.MNode (node, edge0, edge1) ->
+				push (node, goup_edge' edge0, goup_edge' edge1)
+		) (peval, ident)
+		and     goup_node edge (node, edge0, edge1) =
+			let t0, edge0 = goup_edge edge0
+			and t1, edge1 = goup_edge edge1 in
+			let node = (node, edge0, edge1) in
+			if t0||t1
+			then (M.compose edge (push node))
+			else (edge, Utils.Node (G.push man node))
+		and     read_edge (edge, next) = match next with
+			| GTree.Leaf next -> goup_edge' (edge, next)
+			| GTree.Node node -> goup_node   edge (read_node node |> Utils.pnode_of_node)
+		and     read_node (node, edge0, edge1) =
+			(node, read_edge edge0, read_edge edge1)
+		in
+		{man; mem; push; eval}
+
+	let makeman hsize =
+		let man = G.makeman hsize in
+		import' hsize man
+
+    let default_newman_hsize = 10000
+
+    let newman () = makeman default_newman_hsize
+
+	let import = import' default_newman_hsize
+
+    let dump_stats man = Tree.Node [
+		G.dump_stats man.man;
+		Hashcache.tt_dump_stats man.mem;
+	]
+
+	let push man = man.push
+	let pull man ident = G.pull man.man ident
+
+	let dump man = G.dump man.man
+	let load stree =
+		let man, edges = G.load stree in
+		(import man, edges)
+
+	let eval man = man.eval
 
 
 	
@@ -198,6 +283,76 @@ struct
 		let memR, applyR = MemoBTable.make O3.id o3sB hsize in
 		let o3sA = BinO3.closure M0.M.(M.o3s_peval +* G.o3s_ident) in
 		let memE, applyE = MemoBTable.make  o3sA o3sB hsize in
+		let compose = M0.M.M.compose in	
+		let push : M0.node' -> M0.edge' = M0.M.push man
+		and pull : M0.ident -> M0.node' = M0.M.pull man in
+		(* goup = go up *)
+		let rec goup_edge ((edge, next) : M0.edge'') : bool * M0.edge'= match next with
+			| Utils.Leaf leaf -> (false, (edge, Utils.Leaf leaf))
+			| Utils.Node (opeval, ident) -> match opeval with
+				| None -> (false, (edge, Utils.Node ident))
+				| Some peval -> (true, compose edge (eval_ident peval ident))
+		and     eval_ident peval ident : M0.edge' = applyE (fun (peval, ident) ->
+			let node = pull ident in
+			match M0.M.M.eval_node peval (Utils.pnode_of_node node) with
+			| Utils.MEdge edge -> goup_edge edge |> snd
+			| Utils.MNode node -> goup_node node
+		) (peval, ident)
+		and     goup_node (node, edge0, edge1) : M0.edge' =
+			let t0, edge0 = goup_edge edge0
+			and t1, edge1 = goup_edge edge1 in
+			let node : M0.node' = (node, edge0, edge1) in
+			if t0||t1
+			then (rewr node)
+			else (push node)
+		and     rewr (node : M0.node') : M0.edge' = read_edge (M0.rewrite (Utils.pnode_of_node node))
+		and     read_edge (edge, node) : M0.edge' = match node with
+			| GTree.Leaf (next : M0.next'') -> goup_edge ((edge, next) : M0.edge'') |> snd
+			| GTree.Node (node, edge0, edge1) ->
+				goup_node (Utils.pnode_of_node (node, read_edge edge0, read_edge edge1))
+		in
+		let rec down_ident ident : M0.edge' = applyR (fun ident ->
+			let (node, edge0, edge1) = pull ident in
+			rewr (node, down_edge edge0, down_edge edge1)
+		) ident
+		and     down_edge ((edge, next) : M0.edge') : M0.edge' = match next with
+			| Utils.Leaf leaf -> (edge, Utils.Leaf leaf)
+			| Utils.Node ident -> compose edge (down_ident ident)
+		in
+		let map opeval edge : M0.edge' =
+			let edge = match opeval with
+				| None -> edge
+				| Some peval -> goup_edge (M0.M.M.eval_edge peval (Utils.pedge_of_edge edge)) |> snd
+			in
+			down_edge edge
+		in
+		{man; memR; memE; map}
+
+  let default_newman_hsize = 10000
+
+	let newman man = makeman man default_newman_hsize	
+end
+
+module REWRITE_CACHED(M0:REWRITE_MODELE) =
+struct
+
+	type manager = {
+		man : M0.M.manager;
+		memR : (M0.ident, M0.ident, M0.edge', Bitv.t) Hashcache.tt;
+		memE : (M0.M.M.peval * M0.ident, Bitv.t, M0.edge', Bitv.t) Hashcache.tt;
+		map : M0.M.M.peval option -> M0.edge' -> M0.edge';
+	}
+
+	let dump_stats man = Tree.Node [
+		Tree.Node [ Tree.Leaf "memR:"; Hashcache.tt_dump_stats man.memR];
+		Tree.Node [ Tree.Leaf "memE:"; Hashcache.tt_dump_stats man.memE];
+	]
+
+	let makeman man hsize =
+		let o3sB = M0.M.G.o3b_edge' in
+		let memR, applyR = Hashcache.tt_make O3.id o3sB hsize in
+		let o3sA = BinO3.closure M0.M.(M.o3s_peval +* G.o3s_ident) in
+		let memE, applyE = Hashcache.tt_make  o3sA o3sB hsize in
 		let compose = M0.M.M.compose in	
 		let push : M0.node' -> M0.edge' = M0.M.push man
 		and pull : M0.ident -> M0.node' = M0.M.pull man in
@@ -315,5 +470,3 @@ struct
 			| [] -> assert false
 			| objet::_ -> stree_load objet
 end
-
-(* TODO : module EXPORT with left-right propagation *)

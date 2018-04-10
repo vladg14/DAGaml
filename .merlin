@@ -1,10 +1,18 @@
 S .
 S src
+S bitv
+S grobdd
+S io
 S test
 S tools
+S icp
 
 B _build
 B _build/tools
 B _build/src
 B _build/test
+B _build/bitv
+B _build/io
+B _build/grobdd
+B _build/icp
 

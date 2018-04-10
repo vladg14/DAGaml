@@ -88,9 +88,7 @@ struct
         man = H2Table.create hsize 0;
     }
 
-    let default_newman_hsize = 10000
-
-    let newman () = makeman default_newman_hsize
+    let newman () = makeman H2Table.default_size
 
 	let getsize man =
 		H2Table.mapreduce man.man 0 (fun _ -> Bitv.length) (+)
@@ -152,7 +150,7 @@ struct
 		)
 		| _ -> assert false
 
-	let load stree = load' default_newman_hsize stree
+	let load stree = load' H2Table.default_size stree
 
 end
 
@@ -196,9 +194,7 @@ struct
 		) ident
 		in {src; dst; man; map_next; map_edge; map_node}
     
-	let default_newman_hsize = 10000
-	
-	let newman src dst = makeman src dst default_newman_hsize
+	let newman src dst = makeman src dst MemoTable.default_size
 
 	let man_next man = man.map_next
 	let man_edge man = man.map_edge
@@ -229,9 +225,7 @@ struct
 			| Utils.Node ident -> Utils.Node (map_node ident)
 		in {src; dst; mem; map_node; map_edge}
 	
-	let default_newman_hsize = 10000
-
-	let newman src dst = makeman src dst default_newman_hsize
+	let newman src dst = makeman src dst MemoTable.default_size
 
 	let map_node man = man.map_node
 	let map_edge man = man.map_edge
@@ -275,9 +269,41 @@ struct
 		) ident
 		in {src; dst; man; map_next; map_edge; map_node}
     
-	let default_newman_hsize = 10000
+	let newman src dst = makeman src dst MemoBTable.default_size
+
+	let man_next man = man.map_next
+	let man_edge man = man.map_edge
+	let man_node man = man.map_node
 	
-	let newman src dst = makeman src dst default_newman_hsize
+end
+
+module SEM_MAP_CACHED(M0:SEM_MAP_MODELE) =
+struct
+	type manager = {
+		src :  M0.SRC.manager;
+		dst :  M0.DST.manager;
+		man : (M0.SRC.ident, M0.SRC.ident, M0.DST.edge', Bitv.t) Hashcache.tt;
+		map_next : M0.SRC.next' -> M0.DST.edge';
+		map_edge : M0.SRC.edge' -> M0.DST.edge';
+		map_node : M0.SRC.ident -> M0.DST.edge';
+	}
+
+	let makeman src dst hsize =
+		let man, apply = Hashcache.tt_make O3.id M0.DST.o3b_edge' hsize in
+		let rec map_next = function
+			| Utils.Leaf leaf -> M0.map_leaf leaf
+			| Utils.Node ident -> map_node ident
+		and     map_edge (edge, next) = M0.map_edge edge (map_next next)
+		and     map_node ident = apply (fun ident ->
+			let (node, edge'0, edge'1) = M0.SRC.pull src ident in
+			let edge', merge = M0.map_node node (map_edge edge'0) (map_edge edge'1) in
+			(edge', match merge with
+				| Utils.MEdge next' -> next'
+				| Utils.MNode node' -> Utils.Node(M0.DST.push dst node'))
+		) ident
+		in {src; dst; man; map_next; map_edge; map_node}
+    
+	let newman src dst = makeman src dst Hashcache.default_size
 
 	let man_next man = man.map_next
 	let man_edge man = man.map_edge
@@ -334,9 +360,46 @@ struct
 		let     rec_edge edge = M.map_edge extra (map_edge edge) in
 		{man; extra; mem; rec_node; rec_edge}
 
-    let default_newman_hsize = 10000
+	let newman man extra = makeman man extra MemoBTable.default_size
+	
+	let rec_edge man = man.rec_edge
+	let rec_node man = man.rec_node
+end
 
-	let newman man extra = makeman man extra default_newman_hsize
+module EXPORT_CACHED(M:EXPORT_MODELE) =
+struct
+
+	type next'' = (unit -> M.xnode) M.M.M.next'
+	type edge'' = (unit -> M.xnode) M.M.M.edge'
+	type node'' = (unit -> M.xnode) M.M.M.node'
+
+	type manager = {
+		man : M.M.manager;
+		extra : M.extra;
+		mem : (M.M.ident, M.M.ident, M.xnode, M.xnode') Hashcache.tt;
+		rec_edge : M.M.edge' -> M.xedge;
+		rec_node : M.M.ident -> M.xnode;
+	}
+
+	let dump_stats man = Hashcache.tt_dump_stats man.mem
+
+	let makeman man extra hsize =
+		let mem, apply = Hashcache.tt_make O3.id M.o3_xnode hsize in
+		let rec map_next : M.M.next' -> next'' = function
+			| Utils.Leaf leaf -> Utils.Leaf leaf
+			| Utils.Node link -> Utils.Node (fun () -> rec_node link)
+		and     map_edge ((edge, next) : M.M.edge') : edge'' =
+			(edge, map_next next)
+		and     map_node ((node, edge0, edge1) : M.M.node') : node'' =
+			(node, map_edge edge0, map_edge edge1)
+		and     rec_node (ident : M.M.ident) : M.xnode = apply (fun ident ->
+			M.map_node extra (map_node (M.M.pull man ident))
+		) ident
+		in
+		let     rec_edge edge = M.map_edge extra (map_edge edge) in
+		{man; extra; mem; rec_node; rec_edge}
+
+	let newman man extra = makeman man extra Hashcache.default_size
 	
 	let rec_edge man = man.rec_edge
 	let rec_node man = man.rec_node
@@ -388,9 +451,7 @@ struct
 		let     rec_edge edge = M.map_edge extra (map_edge edge) in
 		{man; extra; mem; rec_node; rec_edge}
 
-    let default_newman_hsize = 10000
-
-	let newman man extra = makeman man extra default_newman_hsize
+	let newman man extra = makeman man extra MemoTable.default_size
 	
 	let rec_edge man = man.rec_edge
 	let rec_node man = man.rec_node

@@ -1,3 +1,9 @@
 [submodule "DAGaml-docs"]
 	path = DAGaml-docs
 	url = https://gitlab.com/JoanThibault/DAGaml-docs.git
+[submodule "DAGaml-benchmarks"]
+	path = DAGaml-benchmarks
+	url = https://github.com/JoanThibault/DAGaml-benchmarks.git
+[submodule "tools"]
+	path = src/tools
+	url = https://github.com/JoanThibault/ocaml-tools.git

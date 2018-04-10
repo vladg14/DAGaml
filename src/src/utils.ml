@@ -37,6 +37,7 @@ type ('leaf, 'node) gnode =
 	| Leaf of 'leaf
 	| Node of 'node
 
+
 let gnode_leaf = function
 	| Leaf leaf -> leaf
 	| Node _ -> assert false
@@ -48,7 +49,6 @@ let gnode_node = function
 let dump_gnode dump_leaf dump_node gnode stream = match gnode with
 	| Leaf leaf -> false::(dump_leaf leaf stream)
 	| Node node -> true ::(dump_node node stream)
-
 
 let load_gnode load_leaf load_node = function
 	| false::stream ->
@@ -70,6 +70,21 @@ let o3s_gnode
 (
 	dump_gnode dump_leaf dump_node,
 	load_gnode load_leaf load_node
+)
+
+let kldump_gnode dump_leaf dump_node gnode stream = match gnode with
+	| Leaf leaf -> let (k, l) = dump_leaf leaf stream in (false::k, l)
+	| Node node -> let (k, l) = dump_node node stream in (true ::k, l)
+
+let klload_gnode load_leaf load_node (k, l) = match k with
+	| false::k -> let leaf, stream = load_leaf (k, l) in Leaf leaf
+	| true ::k -> let node, stream = load_node (k, l) in Node node
+	| [] -> assert false
+
+let klo3s_gnode (dump_leaf, load_leaf) (dump_node, load_node) =
+(
+	kldump_gnode dump_leaf dump_node,
+	klload_gnode load_leaf load_node
 )
 
 let gnode_is_leaf = function

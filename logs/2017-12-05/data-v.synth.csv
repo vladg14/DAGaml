@@ -1,0 +1,96 @@
+hist:opt time [10]
+0	3	13	30	52	73	71	91	101	78	72	76	64	51	48	24	27	26	14	16	15	8	5	14	2	3	4	4	2	4	4	0	1	1	0	1	0	0	0	0	0	0	1	0	0	0	1
+hist:#{call to minisat}
+0	0	0	0	0	0	4	6	18	22	55	71	70	84	84	114	100	123	111	85	53
+hist:#{new solution}
+0	0	0	2	16	24	33	60	75	84	97	73	117	122	113	92	66	22	3	1
+hist:#{rejection}
+0	21	148	301	349	173	8
+stats:gen
+mean:         3.0158640000000028
+stdd:         0.23380076454964785
+min:          2.384
+max:          4.556
+mediane:      3.024
+1st quartile: 2.872
+3rd quartile: 3.14
+stats:opt time
+mean:         109.27652399999992
+stdd:         55.97053139327357
+min:          14.624
+max:          464.624
+mediane:      98.892
+1st quartile: 70.712
+3rd quartile: 134.772
+stats:#{call to minisat}
+mean:         14.921
+stdd:         3.195740759198094
+min:          6
+max:          20
+mediane:      15
+1st quartile: 13
+3rd quartile: 17
+stats:#{new solution}
+mean:         11.392
+stdd:         3.2034880989321617
+min:          3
+max:          19
+mediane:      12
+1st quartile: 9
+3rd quartile: 14
+stats:#{rejection}
+mean:         3.529
+stdd:         1.0320654049041738
+min:          1
+max:          6
+mediane:      4
+1st quartile: 3
+3rd quartile: 4
+stats:abc time
+mean:         27.12953600000004
+stdd:         0.9044461602019206
+min:          23.092
+max:          29.608
+mediane:      27.172
+1st quartile: 26.528
+3rd quartile: 27.716
+stats:conv time
+mean:         1.4822399999999996
+stdd:         0.09265371228396635
+min:          1.188
+max:          1.892
+mediane:      1.488
+1st quartile: 1.42
+3rd quartile: 1.544
+stats:#gate init
+mean:         62507.153
+stdd:         16.770438008591128
+min:          62446
+max:          62556
+mediane:      62507
+1st quartile: 62495
+3rd quartile: 62519
+stats:#gate post
+mean:         47655.942
+stdd:         61.02637655964838
+min:          47440
+max:          47827
+mediane:      47660
+1st quartile: 47617
+3rd quartile: 47698
+stats:delta(#gate)
+mean:         14851.211
+stdd:         57.78448302961621
+min:          14711
+max:          15069
+mediane:      14849
+1st quartile: 14811
+3rd quartile: 14886
+stats:total
+mean:         140.9041640000004
+stdd:         56.02982384999173
+min:          45.836
+max:          496.26
+mediane:      129.8
+1st quartile: 102.488
+3rd quartile: 166.76399999999998

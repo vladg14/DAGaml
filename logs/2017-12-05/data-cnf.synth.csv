@@ -1,0 +1,56 @@
+hist:opt time [10]
+0	0	0	1	1	1	4	15	13	17	14	23	42	34	32	39	48	50	51	49	53	44	46	49	28	44	29	26	31	24	11	13	18	16	12	14	12	13	6	10	7	3	5	4	4	4	3	6	4	2	3	4	2	2	2	0	2	1	1	1	2	1	1	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0	1
+hist:#{call to minisat}
+0	0	0	0	0	0	0	2	8	10	27	35	32	37	79	88	110	113	133	158	167	1
+hist:#{new solution}
+0	0	0	0	5	15	13	22	39	38	66	69	106	119	136	155	135	64	15	3
+hist:#{rejection}
+0	21	148	301	349	173	8
+stats:gen
+mean:         1.874196000000002
+stdd:         0.04109882703922332
+min:          1.752
+max:          2.264
+mediane:      1.872
+1st quartile: 1.856
+3rd quartile: 1.888
+stats:opt time
+mean:         232.16019599999981
+stdd:         104.61392756397969
+min:          39.228
+max:          963.02
+mediane:      213.788
+1st quartile: 162.728
+3rd quartile: 278.244
+stats:#{call to minisat}
+mean:         16.552
+stdd:         2.9528454073994457
+min:          7
+max:          21
+mediane:      17
+1st quartile: 15
+3rd quartile: 19
+stats:#{new solution}
+mean:         13.023
+stdd:         2.9716108426239103
+min:          4
+max:          19
+mediane:      14
+1st quartile: 11
+3rd quartile: 15
+stats:#{rejection}
+mean:         3.529
+stdd:         1.0320654049041738
+min:          1
+max:          6
+mediane:      4
+1st quartile: 3
+3rd quartile: 4
+stats:total
+mean:         234.0343920000001
+stdd:         104.61315302575645
+min:          41.104
+max:          964.8919999999999
+mediane:      215.716
+1st quartile: 164.572
+3rd quartile: 280.10400000000004
